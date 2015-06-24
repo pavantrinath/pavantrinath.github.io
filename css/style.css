@@ -1,0 +1,152 @@
+
+body{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+h1 {
+    font-family:"Wellfleet";
+	font-weight:normal;
+	font-size: 55px;
+	text-align: center;
+	color: #fff;
+	margin: 0;
+	padding: 0;
+}
+
+h2 {
+   font-family:"Arvo";
+   font-weight: normal;
+   font-size: 40px;
+   text-align: center;
+   color: #fff;
+   margin: 0;
+	padding: 0;
+}
+
+h3 {
+   font-family: "Oswald";
+   font-weight: normal;
+   font-size: 16px;
+   text-align: center;
+   margin: 5px 0;
+	padding: 0;
+	z-index: 1;
+	position: relative;
+}
+
+
+
+.center { margin: 0 auto; }
+.content{ margin: 0 auto; width: 960px; }
+.clear { clear: both; }
+a.lpanel { float: left; color: #e1e1e1; font-size: 12px; font-family:"Wellfleet"; text-decoration: none; margin: 7px 11px; }
+a.rpanel { float: right; color: #e1e1e1;  font-size: 12px; font-family:"Wellfleet"; text-decoration: none; margin: 7px 11px; }
+
+a.lpanel:hover{ color: #fff; }
+a.rpanel:hover{ color: #fff; }
+/*= HEADER & NAVIGATION
+--------------------------------------------------------*/
+
+#header {
+	width: 100%;
+	background: url('../img/header-bg.png');
+
+	height: 80px;
+	position: fixed;
+	margin-top: 30px;
+}
+
+#nav { width: 410px; float: right; margin-top: 20px; }
+#logo a { color: #fff; text-decoration: none; float: left; font-size: 30px; margin-top: 20px; color: #fff; font-family:"Wellfleet"; font-weight: bold; }
+#nav ul{
+	list-style: none;
+	display: block;
+	margin: 0 auto;
+	list-style: none;
+}
+
+#nav li{
+	margin-top: 9px;
+	float: left;
+	padding-left: 21px;
+}
+
+#nav li a { color: #fff; opacity:0.6; font-size: 16px; text-decoration: none; font-family: 'Wellfleet'; }
+#nav li a.active { color: #fff; opacity:1; border-bottom: 2px solid #fff; }
+#nav li a:hover { color: #fff; opacity:1;  }
+
+
+
+
+#divider { background: url('../img/divider.png')no-repeat; width: 300px; height: 35px; margin: 0px auto 27px auto; }
+
+
+/*= BUTTONS
+--------------------------------------------------------*/
+
+button.btn-know {
+	padding: 15px 47px;
+	margin: 40px 38.8%;
+	text-align: center;
+	border: 4px solid #fff;
+	color: #fff;
+	background: transparent;
+	font-size: 19px;
+	cursor: pointer;
+	text-shadow: -1px 2px 0px rgba(90, 90, 90, 0.56);
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.btn-know:hover { background: #fff; color: transparent; }
+ul.built { list-style: none; margin: 0 auto; width: 730px; }
+.built li img{ float: left; padding-right: 34px; }
+
+
+
+
+#home, #skills{ width: 100%; }
+#home{
+	background:url('../img/base1.JPG') no-repeat center fixed;
+
+
+	color: #fff;
+	height: 100%;
+	margin: 0;
+	padding: 200px 0 300px 0;
+	background-size: cover;
+}
+
+
+#skills{
+	background-color: #fff;
+	color: #333333;
+	height: 50%;
+	margin: 0 auto;
+	overflow: hidden;
+	padding: 200px 0;
+}
+
+#projects{
+	background-color: #86daca;
+	color: #fff;
+	height: 100%;
+	padding: 200px 0 260px 0;
+	background-size: cover;
+}
+
+#contact{
+	background-color: #585858;
+	color: #333333;
+	height: 50%;
+	padding: 200px 0;
+}
+
+
+
+
+
+#copyright  { color: #fff; font-family:"Wellfleet";  font-size: 14px; margin-top: 100px; text-align: center;  }
+#copyright  a { text-decoration: none; color: #fff;  }

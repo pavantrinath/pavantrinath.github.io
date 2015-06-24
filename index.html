@@ -1,83 +1,107 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html lang="en">
+  <head>
     <meta name="author" content="Pavan Trinath's Portfolio">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet" />
-    <link href="css/font-awesome-4.3.0/css/font-awesome-min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/89f2f44ba07ea3fff7e561c2142813b278c2d6c6/devicon.min.css">
 
 
 
+       <link rel="stylesheet" href="css/style.css"/>
+	   <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+       <link href='http://fonts.googleapis.com/css?family=Wellfleet' rel='stylesheet' type='text/css'>
+	   <link href='http://fonts.googleapis.com/css?family=Wellfleet' rel='stylesheet' type='text/css'>
+	   <link href='http://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+	   <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+	   <link href='http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911' rel='stylesheet' type='text/css'>
+	<script>
 
-  <title> Pavan Trinath's Portfolio</title>
-</head>
+
+$(document).ready(function() {
+  $('a[href*=#]').each(function() {
+    if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'')
+    && location.hostname == this.hostname
+    && this.hash.replace(/#/,'') ) {
+      var $targetId = $(this.hash), $targetAnchor = $('[name=' + this.hash.slice(1) +']');
+      var $target = $targetId.length ? $targetId : $targetAnchor.length ? $targetAnchor : false;
+       if ($target) {
+         var targetOffset = $target.offset().top;
+
+<!----- JQUERY CLICK FUNCTION REMOVE AND ADD CLASS "ACTIVE" + SCROLL TO THE #DIV--->
+         $(this).click(function() {
+            $("#nav li a").removeClass("active");
+            $(this).addClass('active');
+           $('html, body').animate({scrollTop: targetOffset}, 1000);
+           return false;
+         });
+      }
+    }
+  });
+
+});
+
+
+</script>
+
+
+ </head>
+
 <body>
 
-  <nav class="navbar navbar-fixed-top navbar-default" role ="navigation">
-    <div class="container">
-      <div class = "navbar-header">
-        <button type="button" class = "navbar-toggle" data-toggle="collapse"data-target= "#navbar-collapse-main">
-              <span class="sr-only"> Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-        </button>
-       <a class="navbar-brand" href="#">Pavan Trinath</a>
-       </div>
-       <div class="collapse navbar-collapse" id="navbar-collapse-main">
-       <ul class="nav navbar-nav navbar-right">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#skills">Skills</a></li>
-          <li><a href="#contact">Contact</a></li>
-       </ul>
-       </div>
-      </div>
-  </nav>
 
+<header id="header">
+<div class="content">
+<div id="logo"><a href=""> Pavan Trinath </a></div>
 
-<!-- basic nav setup -->
-  <div id ="home" class = "home">
+<nav id="nav">
+	<ul>
+		<li><a href="#home" class="active">Home</a></li>
+		<li><a href="#skills">Skills</a></li>
+		<li><a href="#projects">Projects</a></li>
+		<li><a  href="#contact">Contact</a></li>
 
-    <div class = "text-vcenter">
-
-
-      <a href="#skills" class="btn btn-default btn-lg">Continue</a>
-    </div>
- </div>
-
-  <div id="skills" class ="pad-section">
-    <div class = "container">
-      <h2 class="text-center"> Skills</h2> <hr />
-        <div class ="row text-center">
-
-        <div class="col-sm-3 col-xs-12 col-md-3">
-          <img src="./images/python.png" alt=""/>
-        </div>
-
-         <div class="col-sm-3 col-xs-12 col-md-3">
-          <img src="./images/html5.png"/>
-        </div>
-
-
-    </div>
-  </div>
+	</ul>
+</nav>
 </div>
-<div id="contact"></div>
-
-<footer>
-<hr />
- <div class="container">
-  <p class="text-right">Copyright &copy; Pavan Trinath 2015</p>
- </div>
-</footer>
+</header>
 
 
-      <script src="//maps.google.com/maps/api/js?sensor=true"></script> -
-      <script src="js/jquery-1.11.3.js"></script>
-      <script src="js/bootstrap.min.js"></script>
-      <script src = "js/main.js"></script>
+
+	<div id="home">
+		<div class="content">
+
+	       <h1 id= "Full">FULL STACK DEVELOPER</h1>
+         <div id="divider"> </div>
+		    <h1 id = "mach">MACHINE LEARNING ENTHUSIAST</h1>
+
+
+
+		</div>
+    </div>
+
+	<div id="skills">
+    <h2> Skills </h2>
+    </div>
+
+
+   <div id="projects">
+   <h2> Projects</h2>
+		    </div>
+
+
+
+	<div id="contact">
+    <h2> Contact </h2>
+    <h3> Pavan Trinath Vutukuru</h3>
+    <h3> Phone : 716-622-6770</h3>
+    <h3> Email : pavantrinath@gmail.com </h3>
+		<div id="copyright">Copyright Pavan Trinath 2015 </a></div>
+    </div>
+
+
+
+
+
 
 
 
