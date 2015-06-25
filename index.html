@@ -49,7 +49,17 @@ $(document).ready(function() {
 
 <body>
 
+<div id="preloader">
+  <script>
+  jQuery(document).ready(function($) {
 
+// site preloader -- also uncomment the div in the header and the css style for #preloader
+$(window).load(function(){
+	$('#preloader').fadeOut('slow',function(){$(this).remove();});
+});
+});
+  </script>
+</div>
 <header id="header">
 <div class="content">
 <div id="logo"><a href=""> Pavan Trinath </a></div>
