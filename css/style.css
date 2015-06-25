@@ -1,5 +1,8 @@
 
 body{
+
+	height: 100%;
+
 	margin: 0;
 	padding: 0;
 	width: 100%;
@@ -14,6 +17,10 @@ h1 {
 	margin: 0;
 	padding: 0;
 }
+
+
+
+
 
 #Full {
     font-family:"Wellfleet";
@@ -47,11 +54,10 @@ h2 {
 #Skil {
    font-family:"Arvo";
    font-weight: normal;
-   font-size: 40px;
+   font-size: 24px;
    text-align: center;
    color: #000000;
-   margin: 0;
-	padding: 0;
+
 }
 
 
@@ -83,13 +89,13 @@ a.rpanel:hover{ color: #fff; }
 	width: 100%;
 	background: url('../img/header-bg.png');
 
-	height: 80px;
+	height: 50px;
 	position: fixed;
-	margin-top: 30px;
+
 }
 
-#nav { width: 410px; float: right; margin-top: 20px; }
-#logo a { color: #fff; text-decoration: none; float: left; font-size: 30px; margin-top: 20px; color: #fff; font-family:"Wellfleet"; font-weight: bold; }
+#nav { width: 410px; float: right; }
+#logo a { color: #fff; text-align: center; text-decoration: none; float: left; font-size: 24px; margin-top: 10px; color: #fff; font-family:"Wellfleet"; font-weight: bold; }
 #nav ul{
 	list-style: none;
 	display: block;
@@ -103,7 +109,7 @@ a.rpanel:hover{ color: #fff; }
 	padding-left: 21px;
 }
 
-#nav li a { color: #fff; opacity:0.6; font-size: 16px; text-decoration: none; font-family: 'Wellfleet'; }
+#nav li a { color: #fff; opacity:0.6; font-size: 14px; text-decoration: none; font-family: 'Wellfleet'; }
 #nav li a.active { color: #fff; opacity:1; border-bottom: 2px solid #fff; }
 #nav li a:hover { color: #fff; opacity:1;  }
 
@@ -142,28 +148,31 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 	background:url('../img/base1.JPG') no-repeat fixed;
 
 
+	background-position: center ;
+	background-attachment: fixed !important;
 	color: #fff;
-	height: 100%;
+	height: 720px;
 	margin: 0;
-	padding: 200px 0 330px 0;
+	padding: 200px 0 260px 0;
 	background-size: cover;
 }
 
 
 #skills{
-	background-color: #fff;
-	color: #333333;
-	height: 50%;
+	background-color:#2E2E2E;
+	color:  : #86daca;
+	height:  600px;
+	padding: 70px 0;
 	margin: 0 auto;
-	overflow: hidden;
-	padding: 200px 0;
+
+
 }
 
 #projects{
-	background-color: #86daca;
+	background-color: #86daca no-repeat fixed;
 	color: #fff;
 	height: 600px;
-	padding: 200px 0 260px 0;
+	padding:140px 0 0 0;
 	background-size: cover;
 }
 
@@ -171,16 +180,17 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 	background-color: #585858;
 	color: #333333;
 	height: 300px;
-	padding: 200px 0;
+	padding:50px 0;
 }
 
 #chart {
 
-
+	height: 200px;
+	width: 200px;
   text-align: left;
   box-shadow: 0px 2px 8px rgba(0,0,0,.2);
 
-  margin: 32px auto;
+  margin: 24px auto;
   background: white;
 }
 
