@@ -1,3 +1,10 @@
+@import "compass/css3";
+
+* {
+  @include box-sizing(border-box);
+}
+
+$pad: 20px;
 
 body{
 
@@ -60,7 +67,7 @@ h2 {
 	padding: 0;
 }
 
-#Skil {
+#Skil,#proj {
    font-family:"Arvo";
    font-weight: normal;
    font-size: 24px;
@@ -181,7 +188,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 	background-color: #86daca no-repeat fixed;
 	color: #fff;
 	height: 600px;
-	padding:140px 0 0 0;
+	padding:100px 0 0 0;
 	background-size: cover;
 }
 
@@ -193,7 +200,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 }
 
 #chart {
-
+	align-items: center;
 	height: 200px;
 	width: 200px;
   text-align: left;
@@ -202,6 +209,45 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   margin: 24px auto;
   background: transparent;
 }
+.grid {
+  background: white;
+  margin: 0 0 $pad 0;
+
+  &:after {
+    /* Or @extend clearfix */
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+[class*='col-'] {
+	float: left;
+  padding-right: $pad;
+  .grid &:last-of-type {
+  	padding-right: 0;
+
+  }
+}
+.col-1-4 {
+  width: 20%;
+  background-color: #ffffff;
+  height: 160px;
+  padding: 5px 5px 5px 5px;
+  /* border-right: 10px; */
+  /* border-left: antiquewhite; */
+  margin-right: 10px;
+  margin-top: 30px;
+  margin-left: 50px;
+
+	border: 1px solid #000000;
+.grid-pad {
+  padding: $pad 0 $pad $pad;
+  [class*='col-']:last-of-type {
+    padding-right: $pad;
+  }
+}
+
 
 
 #copyright  { color: #fff; font-family:"Wellfleet";  font-size: 14px; margin-top: 100px; text-align: center;  }
