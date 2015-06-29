@@ -25,17 +25,6 @@ h1 {
 	padding: 0;
 }
 
-#preloader {
-	position: fixed;
-	left: 0;
-	 top: 0;
-	z-index: 999;
-	 width: 100%;
-	height: 100%;
-	overflow: visible;
-	background: #333 url('http://files.mimoymima.com/images/loading.gif') no-repeat center center;
-	}
-
 
 
 #Full {
@@ -80,10 +69,10 @@ h2 {
 
 
 h3 {
-   font-family: "Oswald";
+   font-family: "Arvo";
    color: #000;
-   font-weight: normal;
-   font-size: 16px;
+   font-weight: bold;
+   font-size: 18px;
    text-align: center;
    margin: 5px 0;
 	padding: 0;
@@ -114,7 +103,7 @@ a.rpanel:hover{ color: #fff; }
 }
 
 #nav { width: 410px; float: right; }
-#logo a { color: #fff; text-align: center; text-decoration: none; float: left; font-size: 24px; margin-top: 10px; color: #fff; font-family:"Wellfleet"; font-weight: bold; }
+#logo a { color: #fff; text-align: center; text-decoration: none; float: left; font-size: 28px; margin-top: 10px; color: #fff; font-family:"Wellfleet"; font-weight: bold; }
 #nav ul{
 	list-style: none;
 	display: block;
@@ -128,7 +117,7 @@ a.rpanel:hover{ color: #fff; }
 	padding-left: 21px;
 }
 
-#nav li a { color: #fff; opacity:0.6; font-size: 14px; text-decoration: none; font-family: 'Wellfleet'; }
+#nav li a { color: #fff; opacity:0.6; font-size: 16px; text-decoration: none; font-family: 'Wellfleet'; }
 #nav li a.active { color: #fff; opacity:1; border-bottom: 2px solid #fff; }
 #nav li a:hover { color: #fff; opacity:1;  }
 
@@ -200,7 +189,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 
 	height:  100%;
 	padding: 70px 0;
-	margin: 0 auto;
+
   border-bottom: 4px groove #fff;
 
 }
@@ -262,6 +251,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   margin-right: 10px;
   margin-top: 30px;
   margin-left: 50px;
+  border: 1px solid #000;
 
 
 /*.grid-pad {
@@ -275,7 +265,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   text-align: center;
 
   background: rgba(0,0,0,0.5);
-  border: 3px outset #fff;
+  border: 3px outset;
 }
 #proj2:hover{
   text-align: center;
