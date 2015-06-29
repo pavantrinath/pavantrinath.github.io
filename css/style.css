@@ -174,7 +174,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 	margin: 0;
 	padding: 100px 0 260px 0;
 	background-size: cover;
-  border-bottom: 1px solid #fff;
+  border-bottom: 4px groove #fff;
 }
 
 .circular {
@@ -201,7 +201,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 	height:  100%;
 	padding: 70px 0;
 	margin: 0 auto;
-
+  border-bottom: 4px groove #fff;
 
 }
 
@@ -209,8 +209,9 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   background:url('../img/bg.png') no-repeat fixed;
 
 	height: 100%;
-	padding:100px 0 30% 0;
+	padding:70px 0 30% 0;
 	background-size: cover;
+  border-bottom: 4px groove #fff;
 }
 
 #contact{
@@ -255,14 +256,14 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   background-color: transparent;
   height: 160px;
   position: relative;
-  padding: 5px 5px 5px 5px;
+  padding: 5px 15px 5px 5px;
   /* border-right: 10px; */
   /* border-left: antiquewhite; */
   margin-right: 10px;
-  margin-top: 40px;
+  margin-top: 30px;
   margin-left: 50px;
 
-	/*border: px solid #000000;*/
+
 /*.grid-pad {
   padding: $pad 0 $pad $pad;
   [class*='col-']:last-of-type {
@@ -274,6 +275,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   text-align: center;
 
   background: rgba(0,0,0,0.5);
+  border: 3px outset #fff;
 }
 #proj2:hover{
   text-align: center;
