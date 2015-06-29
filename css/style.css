@@ -251,16 +251,16 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 }
 .col-1-4 {
   width: 20%;
-  background-color: #fff;
+  background-color: transparent;
   height: 160px;
-  padding: 5px 5px 5px 5px;
+  padding: 15px 15px 15px 15px;
   /* border-right: 10px; */
   /* border-left: antiquewhite; */
   margin-right: 10px;
   margin-top: 30px;
   margin-left: 50px;
 
-	border: 1px solid #000000;
+	/*border: px solid #000000;*/
 /*.grid-pad {
   padding: $pad 0 $pad $pad;
   [class*='col-']:last-of-type {
@@ -271,37 +271,37 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 #proj1:hover{
   text-align: center;
 
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.5);
 }
 #proj2:hover{
   text-align: center;
 
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.5);
 }
 #proj3:hover{
   text-align: center;
 
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.5);
 }
 #proj4:hover{
   text-align: center;
 
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.5);
 }
 #proj5:hover{
   text-align: center;
 
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.5);
 }
 #proj6:hover{
   text-align: center;
 
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.5);
 }
 #proj7:hover{
   text-align: center;
 
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.5);
 }
 #proj8:hover{
   text-align: center;
