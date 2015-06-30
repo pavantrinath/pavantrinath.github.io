@@ -2,10 +2,9 @@
 
 * {
   @include box-sizing(border-box);
+
+
 }
-
-$pad: 20px;
-
 body{
 
 	height: 100%;
@@ -179,7 +178,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 
 
 	background-position: center ;
-	background-attachment: fixed !important;
+
 	color: #fff;
 	height: 100%;
 	margin: 0;
