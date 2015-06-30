@@ -25,7 +25,20 @@ h1 {
 	padding: 0;
 }
 
+#git,#lin,#fa {
+  text-align: center;
+  padding-top: 10px;
+  margin-top: 20px;
+  margin: 0;
+	padding: 10px;
+  max-width: 48px;
+  max-height: 48px;
+}
 
+#social{
+  text-align: center;
+  padding-top: 20px;
+}
 
 #Full {
     font-family:"Wellfleet";
@@ -64,6 +77,15 @@ h2 {
    font-size: 40px;
    text-align: center;
 
+
+}
+h4{
+  font-family:"Arvo";
+
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
 
 }
 
@@ -251,7 +273,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   margin-right: 10px;
   margin-top: 30px;
   margin-left: 50px;
-  border: 1px solid #000;
+  /*border: 1px solid #000;*/
 
 
 /*.grid-pad {
@@ -260,14 +282,37 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
     padding-right: $pad;
   }*/
 }
+#proj1{
+  background:url("../img/ebola.png") no-repeat;
+
+}
+#proj2{
+  background:url("../img/ini.png") no-repeat;
+}
+#proj3{
+  background:url("../img/barr.png") no-repeat;
+}
+#proj4{
+  background:url("../img/cont.png") no-repeat;
+}#proj5{
+  background:url("../img/cat.png") no-repeat;
+}
+#proj6{
+  background-color: #000;
+}#proj7{
+  background-color: #000;;
+}#proj8{
+  background-color: #000;;
+}
+
 
 #proj1:hover{
   text-align: center;
-
-  background: rgba(0,0,0,0.5);
+  background:url("../img/ebola.png") no-repeat;
+  background-color: rgba(0,0,0,0.5);
   border: 3px outset;
 }
-#proj2:hover{
+/*#proj2:hover{
   text-align: center;
 
   background: rgba(0,0,0,0.5);
@@ -301,7 +346,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   text-align: center;
 
   background: rgba(0,0,0,0.5);
-}
+}*/
 
 #copyright  { color: #fff; font-family:"Wellfleet";  font-size: 14px; margin-top: 100px; text-align: center;  }
 #copyright  a { text-decoration: none; color: #fff;  }
