@@ -284,26 +284,26 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   }*/
 }
 #proj1{
-  background:url("../img/ebola.png") no-repeat;
+  background:url("../img/ebola.png") 100% 0 no-repeat ;
 
 }
 #proj2{
-  background:url("../img/ini.png") no-repeat;
+  background:url("../img/ini.png") 100% 0 no-repeat  ;
 }
 #proj3{
-  background:url("../img/barr.png") no-repeat;
+  background:url("../img/barr.png") 100% 0 no-repeat  ;
 }
 #proj4{
-  background:url("../img/cont.png") no-repeat;
+  background:url("../img/cont.png")100% 0 no-repeat ;
 }#proj5{
-  background:url("../img/cat.png") no-repeat;
+  background:url("../img/cat.png") 100% 0 no-repeat ;
 }
 #proj6{
-  background-color: #000;
+  background-color: #000 ;
 }#proj7{
-  background-color: #000;;
+  background-color: #000 ;
 }#proj8{
-  background-color: #000;;
+  background-color: #000 ;
 }
 
 
