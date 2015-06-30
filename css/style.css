@@ -207,17 +207,17 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 
 
 #skills{
-  background:url('../img/bg.png') no-repeat fixed;
+  background:url('../img/bg.png') fixed;
 
 	height:  100%;
 	padding: 70px 0;
-
+  background-size: cover;
   border-bottom: 4px groove #fff;
 
 }
 
 #projects{
-  background:url('../img/bg.png') no-repeat fixed;
+  background:url('../img/bg.png')  fixed;
 
 	height: 100%;
 	padding:70px 0 30% 0;
@@ -230,6 +230,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 	color: #333333;
 	height: 30%;
 	padding:20px 0;
+  background-size: cover;
 }
 
 #chart {
