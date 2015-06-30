@@ -48,7 +48,7 @@ h1 {
 	margin: 0;
 	padding: 0;
 }
-#mach {
+#mach,#spam {
     font-family:"Wellfleet";
 	font-weight:normal;
 	font-size: 35px;
@@ -300,13 +300,18 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   background:url("../img/cat.png") 100% 0 no-repeat ;
 }
 #proj6{
-  background-color: #000 ;
+  background:url("../img/port.png") 100% 0 no-repeat ;
 }#proj7{
-  background-color: #000 ;
+  background-color: #fff;
+  text-align: center;
+
 }#proj8{
   background-color: #000 ;
 }
 
+#spam{
+  padding-top: 30px;
+}
 
 /*#proj1:hover{
   text-align: center;
