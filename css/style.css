@@ -220,7 +220,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   background:url('../img/bg.png')  50% 0 no-repeat fixed;
 
 	height: 100%;
-	padding:70px 0 30% 0;
+	padding:70px 0 70% 0;
 	background-size: cover;
   border-bottom: 4px groove #fff;
 }
@@ -228,7 +228,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
 #contact{
   background-color: #1fb496;
 	color: #333333;
-	height: 30%;
+	height: 50%;
 	padding:20px 0;
   background-size: cover;
 }
@@ -268,7 +268,7 @@ ul.built { list-style: none; margin: 0 auto; width: 730px; }
   background-color: transparent;
   height: 160px;
   position: relative;
-  padding: 5px 15px 5px 5px;
+  padding: 5px 25px 5px 5px;
   /* border-right: 10px; */
   /* border-left: antiquewhite; */
   margin-right: 10px;
