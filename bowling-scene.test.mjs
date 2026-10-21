@@ -22,6 +22,27 @@ test('run-up advances the swinging foot while keeping the planted foot grounded'
       assert(Math.abs(Math.hypot(limb[2]-limb[0],limb[3]-limb[1])-17)<.01);
       assert(Math.abs(Math.hypot(limb[4]-limb[2],limb[5]-limb[3])-16)<.01);
     }
+
+    for(const ms of [0,150,350,700,1200,1800,2400]){
+      callback(ms);
+      const hipY=points('torso')[1];
+      for(const name of ['left-arm','right-arm']){
+        const arm=points(name);
+        assert(arm[3]>=hipY-12 && arm[3]<=hipY+1,'running elbows stay beside the waist');
+        assert(arm[5]>=hipY-15 && arm[5]<=hipY+2,'running hands stay near waist height');
+        assert(Math.abs(Math.hypot(arm[2]-arm[0],arm[3]-arm[1])-21)<.01);
+        assert(Math.abs(Math.hypot(arm[4]-arm[2],arm[5]-arm[3])-16)<.01);
+      }
+    }
+    callback(4050);
+    const arm=points('left-arm');
+    const upper=[arm[2]-arm[0],arm[3]-arm[1]];
+    const fore=[arm[4]-arm[2],arm[5]-arm[3]];
+    assert(Math.abs(upper[0]*fore[1]-upper[1]*fore[0])<.001,'bowling elbow is straight at release');
+    assert(upper[0]*fore[0]+upper[1]*fore[1]>0,'the elbow extends toward the release hand');
+    const ball=parts.get('[data-part="ball"]').attrs;
+    assert(Math.abs(Number(ball.cx)-arm[4])<.001);
+    assert(Math.abs(Number(ball.cy)-arm[5])<.001);
   } finally {
     for(const [key,descriptor] of Object.entries(originals))if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete globalThis[key];
   }

@@ -15,7 +15,7 @@ export function initBowlingScene(root) {
     run: [0,79, 5,52, 7,39, -6,62,-15,51, 18,62,26,47, -13,94,-24,108, 16,94,29,101],
     bound: [0,68, 3,41, 5,28, 13,30,17,13, -13,53,-20,63, -4,87,-20,96, 21,78,23,95],
     coil: [0,78, 2,49, 4,35, 16,35,20,18, -18,37,-12,18, 16,94,28,111, -13,92,-22,108],
-    release: [0,78, 9,49, 13,35, 19,65,12,78, 5,26,17,9, 17,94,29,111, -12,92,-22,108],
+    release: [0,78, 9,49, 13,35, 19,65,12,78, 13,29,17,9, 17,94,29,111, -12,92,-22,108],
     follow: [4,78, 26,58, 32,46, 24,76,13,86, 38,72,21,87, 18,94,29,111, -10,88,-20,76],
     stand: [0,78, 0,50, 0,36, -8,66,-4,79, 9,64,8,79, -5,94,-8,111, 6,95,9,111],
     sit: [0,84, -2,57, 0,43, 10,72,28,73, 11,72,32,73, 18,85,19,109, 22,87,25,109]
@@ -49,10 +49,17 @@ export function initBowlingScene(root) {
       pose[offset+1]=pose[1]+dy/distance*along-dx/distance*bend;
       pose[offset+2]=fx;pose[offset+3]=fy;
     }
-    // A compact opposing arm swing, with the bowling hand carrying the ball.
-    const swing=Math.sin(phase)*(walking?4:7);
-    pose[6]-=swing;pose[8]-=swing;
-    pose[10]+=swing;pose[12]+=swing;
+    // Bent elbows swing beside the waist during the run-up, rather than
+    // lifting the hands toward the face. Opposing shoulders drive the swing.
+    for(const [offset,shift] of [[6,0],[10,Math.PI]]) {
+      const angle=Math.cos(phase+shift)*(walking?.25:.5);
+      const elbowX=pose[2]+Math.sin(angle)*21;
+      const elbowY=pose[3]+Math.cos(angle)*21;
+      const forearmAngle=walking?.9:-.12+angle*.15;
+      pose[offset]=elbowX;pose[offset+1]=elbowY;
+      pose[offset+2]=elbowX+Math.cos(forearmAngle)*16;
+      pose[offset+3]=elbowY+Math.sin(forearmAngle)*16;
+    }
     return pose;
   }
   function draw(ms) {
