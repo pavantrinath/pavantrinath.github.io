@@ -5,10 +5,11 @@ import { resolve } from 'node:path';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = path => readFile(resolve(root, path), 'utf8');
 const assets = {};
-for (const [path, type] of [['index.html', 'text/html'], ['app.js', 'text/javascript'], ['style.css', 'text/css']]) {
+for (const [path, type] of [['index.html', 'text/html'], ['app.js', 'text/javascript'], ['portfolio-qa.mjs', 'text/javascript'], ['style.css', 'text/css']]) {
   assets['/' + path] = { body: await read(path), type: type + '; charset=utf-8' };
 }
-const context = (await read('worker/portfolio-context.mjs')).replace('export const SYSTEM_CONTEXT', 'const SYSTEM_CONTEXT');
+const facts = (await read('portfolio-qa.mjs')).replace(/export /g, '');
+const context = (await read('worker/portfolio-context.mjs')).replace("import { FACTS } from '../portfolio-qa.mjs';", '').replace('export const SYSTEM_CONTEXT', 'const SYSTEM_CONTEXT');
 const handler = (await read('worker/index.mjs'))
   .replace("import { SYSTEM_CONTEXT } from './portfolio-context.mjs';", '')
   .replace('return env.ASSETS.fetch(request);', 'return env.ASSETS ? env.ASSETS.fetch(request) : serveStatic(request);');
@@ -23,5 +24,6 @@ function serveStatic(request) {
 }
 `;
 await mkdir(resolve(root, '.wrangler'), { recursive: true });
-await writeFile(resolve(root, '.wrangler/deploy.mjs'), context + '\n' + serving + '\n' + handler);
+await writeFile(resolve(root, '.wrangler/deploy.mjs'), facts + '\n' + context + '\n' + serving + '\n' + handler);
 console.log('Direct API bundle ready in .wrangler/deploy.mjs');
+

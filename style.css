@@ -11,7 +11,6 @@ button,input,textarea{font-family:inherit}
 h1,h2,.wordmark,.job-name,.job-detail h3,#opportunity-title{font-family:var(--font-sans)}
 h1,h2{letter-spacing:-.045em;line-height:1.12}
 .mascot{height:auto;min-height:140px;padding:22px 0 16px;gap:10px}
-.portrait{display:block;width:88px;height:88px;object-fit:cover;object-position:45% 38%;border-radius:50%;border:3px solid #fffef8;box-shadow:0 3px 12px #253d3318}
 .mascot-note{margin:0;font:12px/1.5 var(--font-sans)}
 .answer{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:12px;text-align:left;max-height:none;overflow:visible;min-height:100px;padding:4px 0 20px}
 .answer>div:not(.llm-bubble){width:100%}
@@ -27,3 +26,4 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .suggestions button{font-size:12px}
 .branch-buttons button,#opportunity-form input,#opportunity-form textarea{font-family:var(--font-sans)}
 @media(max-width:760px){.intro h1{font-size:clamp(32px,8.5vw,42px);letter-spacing:-.045em}.intro h1 br,.intro h1 br:first-of-type{display:block}.intro>p{font-size:14px}.intro>p>span{font-size:12px}.mascot{min-height:130px}.answer p{font-size:15px}.llm-bubble{padding:18px;margin-left:8px}.toy-top,.toy-top>span:last-child,.toy-bottom{font-family:var(--font-sans);font-size:10px}.toy-bottom{flex-wrap:wrap;gap:5px 12px}.input-entities{font-size:13px}}
+
