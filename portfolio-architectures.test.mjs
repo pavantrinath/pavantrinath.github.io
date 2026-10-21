@@ -21,6 +21,10 @@ test('timeline branch families render hands-on and related knowledge with refere
  const ranking=renderArchitectureKnowledge('robinhood',0);
  assert.match(ranking,/MaskNet/);
  assert.match(ranking,/PLUM/);
+ assert.match(ranking,/HSTU/);
+ assert.match(ranking,/My view:/);
+ assert(!ARCHITECTURE_FAMILIES.generative.worked.includes('HSTU'));
+ assert.match(ARCHITECTURE_CONTEXT,/explicitly confirmed PLUM/);
  assert.match(ranking,/rel="noopener noreferrer"/);
  assert.equal(renderArchitectureKnowledge('unknown',0),'');
 });

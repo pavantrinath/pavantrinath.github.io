@@ -52,7 +52,7 @@ export function matchQuestion(raw) {
 
 export function isModelingQuestion(raw){
  const s=raw.toLowerCase();
- const technical=/\b(?:masknet|ple|llama|onerec|one rec|plum|tiger|realmlp|real mlp|mixture of experts|moe|decision heads|dlrm|mmoe|sasrec|bert4rec|lora|rq.vae|model(?:ing|ling|s)?|machine learning|transformers?|embeddings?|recommend(?:er|ers|ation|ations)|ranking|retrieval|reinforcement learning|rl|sft|grpo|fine.tun(?:e|ing)|training|post.training|ner|bert|diffusion|feature engineering|loss functions?|evaluation|inference|neural|architectures?)\b/.test(s);
+ const technical=/\b(?:masknet|ple|llama|onerec|one rec|plum|hstu|tiger|realmlp|real mlp|mixture of experts|moe|decision heads|dlrm|mmoe|sasrec|bert4rec|lora|rq.vae|model(?:ing|ling|s)?|machine learning|transformers?|embeddings?|recommend(?:er|ers|ation|ations)|ranking|retrieval|reinforcement learning|rl|sft|grpo|fine.tun(?:e|ing)|training|post.training|ner|bert|diffusion|feature engineering|loss functions?|evaluation|inference|neural|architectures?)\b/.test(s);
  const question=/\b(?:how|why|what|which|when|explain|compare|design|implement|train|tune|evaluate|should|can|help|debug|recommend|tell|describe)\b|\?/.test(s);
  return technical&&(question||s.trim().split(/\s+/).length<=3);
 }
