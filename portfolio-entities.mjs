@@ -5,6 +5,7 @@ const vocabulary = {
   ORG: ['University of Texas at Dallas', 'UT Dallas', 'KL University', 'Capgemini US LLC', 'Capgemini', 'Robinhood', 'Liftoff', 'eBay', 'xAI', 'x AI'],
   LOCATION: ['San Francisco Bay Area', 'San Francisco', 'San Jose', 'Bay Area', 'Richardson', 'Dallas', 'Texas', 'California', 'United States', 'North America', 'India', 'Hyderabad', 'Bengaluru', 'Bangalore', 'New York', 'Seattle', 'London', 'the beach', 'beaches', 'beach'],
   'RESEARCH TOPIC': ['phrase-based machine translation', 'machine translation', 'foundation models', 'generative recommenders', 'generative recommendation', 'generative ranking', 'generative retrieval', 'looped transformers', 'physical intelligence', 'diffusion models', 'post-training RL', 'post-training', 'agentic RL', 'reinforcement learning', 'fine-tuning', 'long-context reasoning', 'sequential models', 'multimodal systems', 'model routing', 'transformers', 'recommenders', 'ranking', 'retrieval', 'agents', 'normalization', 'extraction', 'indexing', 'GRPO', 'SFT', 'BERT', 'NER'],
+  ARCHITECTURE: ['MaskNet', 'PLE', 'Progressive Layered Extraction', 'Llama', 'OneRec', 'One Rec', 'PLUM', 'TIGER', 'RealMLP', 'Real MLP', 'mixture of experts', 'MoE', 'looped Transformers', 'decision heads', 'DLRM', 'MMoE', 'SASRec', 'BERT4Rec', 'LoRA', 'RQ-VAE'],
   PROJECT: ['agentic trading', 'Cortex assistant', 'Cortex'],
   TOOL: ['TensorFlow Serving', 'Hugging Face', 'PyTorch', 'JAX', 'Triton', 'ONNX', 'Kubernetes', 'PySpark', 'Polars', 'BigQuery', 'Docker', 'MySQL', 'MongoDB'],
   LANGUAGE: ['Python', 'Go', 'Java'],
@@ -56,3 +57,4 @@ export function highlightEntities(container) {
     node.replaceWith(template.content);
   }
 }
+

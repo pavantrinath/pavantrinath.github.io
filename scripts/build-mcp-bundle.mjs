@@ -5,11 +5,12 @@ import { resolve } from 'node:path';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = path => readFile(resolve(root, path), 'utf8');
 const assets = {};
-for (const [path, type] of [['index.html', 'text/html'], ['app.js', 'text/javascript'], ['portfolio-qa.mjs', 'text/javascript'], ['portfolio-entities.mjs', 'text/javascript'], ['bowling-scene.mjs', 'text/javascript'], ['style.css', 'text/css']]) {
+for (const [path, type] of [['index.html', 'text/html'], ['app.js', 'text/javascript'], ['portfolio-qa.mjs', 'text/javascript'], ['portfolio-entities.mjs', 'text/javascript'], ['portfolio-architectures.mjs', 'text/javascript'], ['bowling-scene.mjs', 'text/javascript'], ['style.css', 'text/css']]) {
   assets['/' + path] = { body: await read(path), type: type + '; charset=utf-8' };
 }
 const facts = (await read('portfolio-qa.mjs')).replace(/export /g, '');
-const context = (await read('worker/portfolio-context.mjs')).replace("import { FACTS } from '../portfolio-qa.mjs';", '').replace('export const SYSTEM_CONTEXT', 'const SYSTEM_CONTEXT');
+const architectures = (await read('portfolio-architectures.mjs')).replace(/export /g, '');
+const context = (await read('worker/portfolio-context.mjs')).replace("import { FACTS } from '../portfolio-qa.mjs';", '').replace("import { ARCHITECTURE_CONTEXT } from '../portfolio-architectures.mjs';", '').replace('export const SYSTEM_CONTEXT', 'const SYSTEM_CONTEXT');
 const entities = (await read('portfolio-entities.mjs')).replace(/export /g, '');
 const semanticCache = (await read('worker/semantic-cache.mjs')).replace(/^import .*;\n/gm, '').replace('export class SemanticAnswerCache', 'class SemanticAnswerCache');
 const visitorNames = (await read('worker/visitor-names.mjs')).replace('export async function', 'async function');
@@ -29,6 +30,7 @@ function serveStatic(request) {
 }
 `;
 await mkdir(resolve(root, '.wrangler'), { recursive: true });
-await writeFile(resolve(root, '.wrangler/deploy.mjs'), visitorNames + '\n' + facts + '\n' + entities + '\n' + semanticCache + '\n' + context + '\n' + serving + '\n' + handler);
+await writeFile(resolve(root, '.wrangler/deploy.mjs'), visitorNames + '\n' + facts + '\n' + architectures + '\n' + entities + '\n' + semanticCache + '\n' + context + '\n' + serving + '\n' + handler);
 console.log('Direct API bundle ready in .wrangler/deploy.mjs');
+
 

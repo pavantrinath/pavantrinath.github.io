@@ -6,7 +6,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const output = resolve(root, 'dist');
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
-for (const file of ['index.html', 'app.js', 'portfolio-qa.mjs', 'portfolio-entities.mjs', 'bowling-scene.mjs', 'style.css']) {
+for (const file of ['index.html', 'app.js', 'portfolio-qa.mjs', 'portfolio-entities.mjs', 'portfolio-architectures.mjs', 'bowling-scene.mjs', 'style.css']) {
   await copyFile(resolve(root, file), resolve(output, file));
 }
 for (const directory of ['img', 'fav', 'css', 'js']) {
@@ -17,4 +17,3 @@ for (const directory of ['img', 'fav', 'css', 'js']) {
   }
 }
 console.log('Cloudflare static assets ready in dist/.');
-

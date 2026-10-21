@@ -148,7 +148,7 @@ test('shared timeline renderer keeps chat and Experience selections independent'
  const page=makeRoot(),chat=makeRoot();
  const jobs={ebay:{period:'2016',title:'eBay',summary:'NLP',branches:[{name:'Language',detail:'Translation',skills:'BERT'},{name:'Search',detail:'Indexing',skills:'NER'}]},robinhood:{period:'2025',title:'Robinhood',summary:'AI',branches:[{name:'Trading',detail:'Agentic trading',skills:'Agents'},{name:'Cortex',detail:'Cortex assistant',skills:'Memory'}]}};
  const code=source.slice(source.indexOf('function showBranch('),source.indexOf("$('#experience').querySelectorAll"));
- const show=vm.runInNewContext(code+';showJob',{$:()=>page,jobs,selectedJob:'robinhood'});
+ const show=vm.runInNewContext(code+';showJob',{$:()=>page,renderArchitectureKnowledge:()=>'',jobs,selectedJob:'robinhood'});
  show('robinhood',page);
  show('ebay',chat,'chat-job-detail','chat-branch-detail');
  chat.branches[1].click();

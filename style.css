@@ -87,3 +87,19 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .career-preview>.inline-link{margin:12px 4px 0;text-align:left}
 
 .visitor-notice{font:11px/1.5 var(--font-sans);color:var(--muted);margin:0 0 10px}
+
+.architecture-knowledge{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.architecture-knowledge h4{font-size:13px;margin:0 0 5px;font-weight:600}
+.architecture-knowledge .architecture-note{font-size:11px;color:var(--muted);margin:0 0 12px}
+.architecture-family{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:7px;background:var(--paper)}
+.architecture-family h5{font-size:12px;margin:0 0 6px;font-weight:600}
+.architecture-family p{font-size:11px;line-height:1.6}
+.architecture-label{display:block;font-size:10px;color:var(--muted);margin:10px 0 5px}
+.architecture-chips{display:flex;gap:5px;flex-wrap:wrap}
+.architecture-chips span{font:11px/1.5 var(--font-sans);padding:4px 7px;border:1px solid #b8c9a4;background:#e5edda;border-radius:4px}
+.architecture-chips.related span{background:transparent;border-color:var(--line);color:var(--muted)}
+.architecture-family details{margin-top:10px;font-size:10px;color:var(--muted)}
+.architecture-family summary{cursor:pointer}
+.architecture-references{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
+.architecture-references a{text-decoration:underline}
+.entity[data-type="ARCHITECTURE"]{background:#e7e1fb;border-color:#c2b6de}

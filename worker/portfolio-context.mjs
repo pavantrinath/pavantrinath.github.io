@@ -1,3 +1,4 @@
+import { ARCHITECTURE_CONTEXT } from '../portfolio-architectures.mjs';
 import { FACTS } from '../portfolio-qa.mjs';
 const career = {
 ebay:{period:'FEB 2016 — SEP 2024',title:'Senior ML Engineer · eBay',summary:'Traditional NLP, recommenders, and the machinery that makes a marketplace searchable.',branches:[{name:'Language understanding',skills:'Machine translation · BERT · NER',detail:'Machine translation, entity recognition, and language understanding for marketplace content.'},{name:'Structured knowledge',skills:'Extraction · normalization · indexing',detail:'Extracting useful attributes, normalizing messy product content, and making it available to search.'},{name:'Discovery',skills:'Recommenders · inference',detail:'Recommendations and production inference. Built a Triton / ONNX platform handling 100M+ daily inferences.'}]},
@@ -19,7 +20,8 @@ Robinhood project attribution: TL, modeling for BOTH agentic trading and Cortex 
 Location: ${FACTS.location} Happy to come in anywhere across the Bay, including San Jose and San Francisco, to give talks if his experience is relevant to the audience. No exact home address is public.
 Contact: pavantrinath@gmail.com. GitHub: https://github.com/pavantrinath. LinkedIn: https://www.linkedin.com/in/pavantrinath. Website: https://pavantrinath.xyz.
 Skills: Python, Go, Java, PyTorch, JAX, Triton, ONNX, Kubernetes. Foundation models, fine-tuning, SFT, reinforcement learning, agentic RL, GRPO, generative recommenders, ranking, retrieval, agents and model routing. Started with phrase-based machine translation, then NER, BERT, extraction, normalization and indexing.
-Interests: looped transformers, physical intelligence, diffusion models. These are interests, not claims of having built all of them. Some multimodal work, described modestly.
+Architecture experience: ${ARCHITECTURE_CONTEXT}
+Interests: physical intelligence and diffusion models. These remain interests rather than claims of having built them. Some multimodal work, described modestly.
 Education (resume): ${FACTS.education}
 Earlier experience (resume): Developer / Consultant at Capgemini US LLC, October 2015 to February 2016, working on provisioning as a service using Mistral and StackStorm and observability.
 Awards (uploaded resume): ${FACTS.awards}
