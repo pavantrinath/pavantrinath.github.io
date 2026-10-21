@@ -1,4 +1,8 @@
 import { SYSTEM_CONTEXT } from './portfolio-context.mjs';
+import { SemanticAnswerCache } from './semantic-cache.mjs';
+
+// Opportunistic, bounded public-answer cache; eviction/restarts are ordinary misses.
+const answerCache = new SemanticAnswerCache();
 
 const json = (data, status = 200, headers = {}) => Response.json(data, {
   status, headers: { 'Cache-Control': 'no-store', ...headers }
@@ -45,6 +49,8 @@ async function chat(request, env) {
     if (!limit.success) return json({ error: 'Too many questions. Try again in a minute.' }, 429, { 'Retry-After': '60' });
     const model = env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
     if (!/^[a-zA-Z0-9._-]+$/.test(model)) return json({ error: 'AI is temporarily unavailable.' }, 503);
+    const ticket = await answerCache.lookup(message, model, env.AI);
+    if (ticket.answer) return json({ answer: ticket.answer, provider: 'Gemini', cache: ticket.hit });
     const response = await fetch(
       'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent',
       {
@@ -67,7 +73,9 @@ async function chat(request, env) {
     if (!answer || !['STOP', 'MAX_TOKENS'].includes(candidate.finishReason)) {
       return json({ error: 'No answer available. Try another question or contact Pavan.' }, 502);
     }
-    return json({ answer: answer.slice(0, 2400), provider: 'Gemini' });
+    const boundedAnswer = answer.slice(0, 2400);
+    if (candidate.finishReason === 'STOP') answerCache.remember(ticket, boundedAnswer);
+    return json({ answer: boundedAnswer, provider: 'Gemini', cache: 'miss' });
   } catch {
     // Do not log visitor messages, credentials, or raw upstream errors.
     return json({ error: 'AI is temporarily unavailable. Local answers are still available.' }, 502);
