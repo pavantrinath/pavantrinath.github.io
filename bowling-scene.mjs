@@ -7,6 +7,9 @@ export function initBowlingScene(root) {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const get = name => svg.querySelector(`[data-part="${name}"]`);
   const parts = Object.fromEntries(['head','eye','torso','left-arm','right-arm','left-leg','right-leg','ball','desk','seat','shadow','caption','crease'].map(n => [n, get(n)]));
+  parts['left-arm'].setAttribute('stroke','#325c47');
+  parts['left-arm'].setAttribute('stroke-width','3.75');
+  parts['right-arm'].setAttribute('stroke','#829085');
   let frame = 0, started = 0;
   const mix = (a,b,t) => a.map((v,i) => v+(b[i]-v)*t);
   const ease = t => t*t*(3-2*t);
@@ -30,18 +33,29 @@ export function initBowlingScene(root) {
       pose[i+1]=hip+5+(pose[i+1]-hip)*.85;
     }
   }
-  function gait(ms, walking=false) {
-    const pose=[...(walking?poses.stand:poses.run)];
-    const phase=ms/(walking?160:105);
-    pose[1]-=Math.abs(Math.sin(phase))*(walking?.5:1.5);
-    const bounce=pose[1]-(walking?poses.stand[1]:poses.run[1]);
-    for(let i=3;i<14;i+=2)pose[i]+=bounce;
-    for(const [offset,shift] of [[14,0],[18,Math.PI]]) {
-      const angle=phase+shift;
-      // Swinging feet travel forward; planted feet move backward relative
-      // to the advancing hips. The old sign made the figure moonwalk.
-      const fx=-Math.cos(angle)*(walking?7:6);
-      const fy=112-Math.max(0,Math.sin(angle))*(walking?5:12);
+  // A running stride has a short stance and an airborne interval; it is
+  // not a walking cycle with one foot permanently touching the ground.
+  const runEnd=1700, boundEnd=1960, coilEnd=2180, releaseAt=2400;
+  const followEnd=2850, recoverEnd=3200, deskRunEnd=4050;
+  function gait(ms,speed=92/runEnd) {
+    const pose=[...poses.run];
+    const cycle=420, duty=.38;
+    const u=(ms/cycle)%1;
+    const flight=(u>=duty&&u<.5)||(u>=.5+duty);
+    const flightT=u<.5?(u-duty)/(.5-duty):(u-.5-duty)/(.5-duty);
+    const lift=flight?Math.sin(Math.PI*flightT)*5:0;
+    pose[1]-=lift;
+    for(let i=3;i<14;i+=2)pose[i]-=lift;
+    // Forward lean and a higher heel recovery make the pace legible at
+    // this tiny scale. Stance travel matches world travel to avoid sliding.
+    pose[2]+=6;pose[4]+=7;
+    const stanceTravel=speed*cycle*duty;
+    for(const [offset,shift] of [[14,0],[18,.5]]) {
+      const phase=(u+shift)%1;
+      const planted=phase<duty;
+      const t=planted?phase/duty:(phase-duty)/(1-duty);
+      const fx=planted?stanceTravel/2-stanceTravel*t:-stanceTravel/2+stanceTravel*ease(t);
+      const fy=planted?112:112-Math.sin(Math.PI*t)*22;
       const dx=fx-pose[0],dy=fy-pose[1],distance=Math.hypot(dx,dy);
       const along=(17*17-16*16+distance*distance)/(2*distance);
       const bend=Math.sqrt(Math.max(0,17*17-along*along));
@@ -49,13 +63,11 @@ export function initBowlingScene(root) {
       pose[offset+1]=pose[1]+dy/distance*along-dx/distance*bend;
       pose[offset+2]=fx;pose[offset+3]=fy;
     }
-    // Bent elbows swing beside the waist during the run-up, rather than
-    // lifting the hands toward the face. Opposing shoulders drive the swing.
     for(const [offset,shift] of [[6,0],[10,Math.PI]]) {
-      const angle=Math.cos(phase+shift)*(walking?.25:.5);
+      const angle=Math.cos(u*Math.PI*2+shift)*.5;
       const elbowX=pose[2]+Math.sin(angle)*21;
       const elbowY=pose[3]+Math.cos(angle)*21;
-      const forearmAngle=walking?.9:-.12+angle*.15;
+      const forearmAngle=-.12+angle*.15;
       pose[offset]=elbowX;pose[offset+1]=elbowY;
       pose[offset+2]=elbowX+Math.cos(forearmAngle)*16;
       pose[offset+3]=elbowY+Math.sin(forearmAngle)*16;
@@ -64,31 +76,33 @@ export function initBowlingScene(root) {
   }
   function draw(ms) {
     let pose, x, ball = null;
-    if (ms < 2600) {
-      const t=ms/2600;
-      pose=gait(ms);
-      x=32+t*92;
+    if (ms < runEnd) {
+      pose=gait(ms);x=32+ms/runEnd*92;
       ball=[x+pose[12],pose[13]];
-    } else if(ms<3200) {
-      pose=mix(gait(2600),poses.bound,ease((ms-2600)/600));x=124+(ms-2600)/600*18;ball=[x+pose[12],pose[13]];
-    } else if(ms<3650) {
-      pose=mix(poses.bound,poses.coil,ease((ms-3200)/450));x=142;ball=[x+pose[12],pose[13]];
-    } else if(ms<4050) {
-      pose=mix(poses.coil,poses.release,ease((ms-3650)/400));x=142;ball=[x+pose[12],pose[13]];
-    } else if(ms<4700) {
-      const t=(ms-4050)/650;
+    } else if(ms<boundEnd) {
+      const t=(ms-runEnd)/(boundEnd-runEnd);
+      pose=mix(gait(runEnd),poses.bound,ease(t));x=124+t*18;
+      ball=[x+pose[12],pose[13]];
+    } else if(ms<coilEnd) {
+      pose=mix(poses.bound,poses.coil,ease((ms-boundEnd)/(coilEnd-boundEnd)));x=142;
+      ball=[x+pose[12],pose[13]];
+    } else if(ms<releaseAt) {
+      pose=mix(poses.coil,poses.release,ease((ms-coilEnd)/(releaseAt-coilEnd)));x=142;
+      ball=[x+pose[12],pose[13]];
+    } else if(ms<followEnd) {
+      const t=(ms-releaseAt)/(followEnd-releaseAt);
       pose=mix(poses.release,poses.follow,ease(t));x=142;
       ball=[159+t*180,14+t*90*t];
-    } else if(ms<5350) {
-      pose=mix(poses.follow,poses.stand,ease((ms-4700)/650));x=142;
-    } else if(ms<6600) {
-      const t=(ms-5350)/1250;
+    } else if(ms<recoverEnd) {
+      pose=mix(poses.follow,poses.stand,ease((ms-followEnd)/(recoverEnd-followEnd)));x=142;
+    } else if(ms<deskRunEnd) {
+      const t=(ms-recoverEnd)/(deskRunEnd-recoverEnd);
       const blend=Math.min(1,t*8,(1-t)*8);
-      pose=mix(poses.stand,gait(ms-5350,true),ease(blend));
-      x=142+ease(t)*58;
+      pose=mix(poses.stand,gait(ms-recoverEnd,58/(deskRunEnd-recoverEnd)),ease(blend));
+      x=142+t*58;
     } else {
-      pose=mix(poses.stand,poses.sit,ease(Math.min(1,(ms-6600)/600)));x=200;
-      if(ms>7300 && ms<9000){const tap=Math.sin(ms/65)*1.5;pose[9]+=tap;pose[13]-=tap;}
+      pose=mix(poses.stand,poses.sit,ease(Math.min(1,(ms-deskRunEnd)/600)));x=200;
+      if(ms>4700 && ms<9000){const tap=Math.sin(ms/65)*1.5;pose[9]+=tap;pose[13]-=tap;}
     }
     const [hx,hy,sx,sy,cx,cy,rex,rey,rhx,rhy,lex,ley,lhx,lhy,rkx,rky,rfx,rfy,lkx,lky,lfx,lfy]=pose;
     const path=(name,points)=>parts[name].setAttribute('d',points.map(([px,py],i)=>`${i?'L':'M'}${x+px} ${py}`).join(' '));
@@ -102,10 +116,10 @@ export function initBowlingScene(root) {
     parts.shadow.setAttribute('cx',x+3);
     parts.ball.setAttribute('opacity',ball?1:0);
     if(ball){parts.ball.setAttribute('cx',ball[0]);parts.ball.setAttribute('cy',ball[1]);}
-    const deskOpacity=Math.max(0,Math.min(1,(ms-4950)/550));
+    const deskOpacity=Math.max(0,Math.min(1,(ms-3000)/400));
     parts.desk.setAttribute('opacity',deskOpacity);parts.seat.setAttribute('opacity',deskOpacity);
     parts.crease.setAttribute('opacity',1-deskOpacity);
-    parts.caption.textContent=ms<3200?'left-arm pace':ms<5000?'release. follow through.':ms<7200?'switching disciplines…':'different pitch. same delivery.';
+    parts.caption.textContent=ms<boundEnd?'left-arm fast bowling':ms<recoverEnd?'left-arm release. follow through.':ms<4650?'switching disciplines…':'different pitch. same delivery.';
   }
   function stop(){cancelAnimationFrame(frame);frame=0;root.removeAttribute('data-playing');replay.textContent='↻ Replay';replay.setAttribute('aria-label','Replay bowling and coding animation');}
   function tick(now){const elapsed=Math.min(now-started,9000);draw(elapsed);if(elapsed<9000)frame=requestAnimationFrame(tick);else stop();}
