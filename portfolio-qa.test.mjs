@@ -55,7 +55,7 @@ test('greetings render without a biography or entity annotations, including subm
   const functions = source.slice(source.indexOf('function classify('), source.indexOf('function applyCorrection('));
   const submit = source.slice(source.indexOf('function hasKnownEntityAnswer('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
-    $, awaitingName:false, isModelingQuestion, showCareerPreview:()=>{},appendCareerPointer:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
+    $, awaitingName:false, isHariniIntroduction:()=>false, isModelingQuestion, showCareerPreview:()=>{},appendCareerPointer:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
     highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
@@ -123,7 +123,7 @@ test('a prepared cache hit renders on Send without showing thinking or generatin
  const code=source.slice(source.indexOf('async function askAI('),source.indexOf("$('#ask-ai').addEventListener"));
  let calls=0;
  const run=vm.runInNewContext(code+';askAI',{
-   $,awaitingName:false,isModelingQuestion,showCareerPreview:()=>{},appendCareerPointer:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
+   $,awaitingName:false,isHariniIntroduction:()=>false,isModelingQuestion,showCareerPreview:()=>{},appendCareerPointer:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
    aiEnabled:true,aiRequest:null,aiVersion:0,hasKnownEntityAnswer:()=>false,classify:()=> 'unknown',normalizePrompt:corrected=>({corrected}),
    document:{createElement:()=>({append(){},set textContent(v){states.push(v)}})},renderEntities:s=>s,annotateInput:s=>s,
    fetch:()=>{calls++;throw Error('cache hit must not generate')}
@@ -231,4 +231,29 @@ test('family answers preserve the named relationships and owner’s exact sentim
  assert.deepEqual(entityMentions('Harini and Rithansh Krathu').map(m=>[m.text,m.type]),[['Harini','PERSON'],['Rithansh Krathu','PERSON']]);
  assert.equal(matchQuestion('How old is Rithansh?'),'unknownfact');
  assert.equal(matchQuestion('What is Rithansh’s age?'),'unknownfact');
+});
+
+test('Harini’s heart greeting requires self-introduction, not a question about her',()=>{
+ const code=source.slice(source.indexOf('function isHariniIntroduction('),source.indexOf('function welcomeHarini('));
+ const introduced=vm.runInNewContext(code+';isHariniIntroduction');
+ for(const s of ["I am Harini","I'm Harini!","My name is Harini.","Hi, I’m Harini!","This is Harini","Harini here"])assert.equal(introduced(s,false),true,s);
+ assert.equal(introduced('Harini',true),true);
+ for(const s of ['Who is Harini?','Tell me about Harini',"I'm not Harini","I am Harini’s friend",'Harini','My name is Jane'])assert.equal(introduced(s,false),false,s);
+});
+
+test('Harini welcome displays the requested line and a finite decorative heart burst',()=>{
+ const nodes=new Map();
+ const $=key=>{if(!nodes.has(key))nodes.set(key,{value:'',replaceChildren(...children){this.children=children}});return nodes.get(key)};
+ const create=()=>({children:[],attrs:{},style:{setProperty(){}},append(...children){this.children.push(...children)},setAttribute(k,v){this.attrs[k]=v},remove(){this.removed=true}});
+ let cleanup;
+ const code=source.slice(source.indexOf('function welcomeHarini('),source.indexOf('function visitorNameFrom('));
+ const welcome=vm.runInNewContext(code+';welcomeHarini',{$,finishIntroduction(){},renderEditor(){},document:{createElement:create},setTimeout:(fn,delay)=>{assert(delay<2500);cleanup=fn}});
+ welcome();
+ const [greeting]=$('#answer').children;
+ const [message,burst]=greeting.children;
+ assert.equal(message.textContent,'Pavan’s reason for existence is here.');
+ assert.equal(burst.attrs['aria-hidden'],'true');
+ assert.equal(burst.children.length,24);
+ cleanup();
+ assert.equal(burst.removed,true);
 });

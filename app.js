@@ -127,6 +127,11 @@ async function askAI(){
   const message=$('#prompt').value.trim();
   clearTimeout(draftTimer);
   if(!message)return;
+  if(isHariniIntroduction(message,awaitingName)){
+    if(awaitingName)await saveIntroduction('Harini');
+    else{aiRequest?.abort();aiVersion++;welcomeHarini();}
+    return;
+  }
   if(awaitingName){
     if(classify(normalizePrompt(message).corrected)==='greeting'){updatePrompt(true);return;}
     const name=visitorNameFrom(message);
@@ -214,19 +219,57 @@ function finishIntroduction(){
  $('#visitor-skip').hidden=true;
  $('#prompt').placeholder='Ask about Pavan’s work, interests, or experience';
 }
+function isHariniIntroduction(raw,collectingName=false){
+ const s=raw.trim().replace(/[’]/g,"'").replace(/^(?:hi|hello|hey)[!,. ]+/i,'').replace(/[.!]+$/,'').trim();
+ return /^(?:i am|i'm|my name is|this is|it's|call me)\s+harini$/i.test(s)
+   || /^harini here$/i.test(s)
+   || (collectingName&&/^harini$/i.test(s));
+}
+function welcomeHarini(){
+ finishIntroduction();
+ $('#prompt').value='';
+ renderEditor('');
+ $('#chat-career').hidden=true;
+ $('#ask-ai').disabled=true;
+ $('#intent').textContent='HELLO, HARINI';
+ const greeting=document.createElement('div');
+ greeting.className='harini-welcome';
+ const message=document.createElement('p');
+ message.textContent='Pavan’s reason for existence is here.';
+ const burst=document.createElement('div');
+ burst.className='heart-burst';
+ burst.setAttribute('aria-hidden','true');
+ for(let i=0;i<24;i++){
+  const heart=document.createElement('span');
+  heart.textContent='♥';
+  const angle=i/24*Math.PI*2;
+  const distance=65+(i%4)*22;
+  heart.style.setProperty('--heart-x',Math.round(Math.cos(angle)*distance)+'px');
+  heart.style.setProperty('--heart-y',Math.round(Math.sin(angle)*distance-40)+'px');
+  heart.style.setProperty('--heart-delay',(i%5)*35+'ms');
+  heart.style.setProperty('--heart-turn',((i%2?1:-1)*(15+i%4*10))+'deg');
+  burst.append(heart);
+ }
+ greeting.append(message,burst);
+ $('#answer').replaceChildren(greeting);
+ setTimeout(()=>burst.remove(),1800);
+}
 function visitorNameFrom(raw){
  const name=raw.trim().replace(/^(?:my name is|i am|i’m|i'm|call me)\s+/i,'').replace(/[.!]+$/,'').trim();
  if(!name||name.length>80||name.split(/\s+/).length>5||!/^[\p{L}\p{M} .’'\-]+$/u.test(name))return null;
+ if(/^harini$/i.test(name))return 'Harini';
  if(/\b(?:hi|hello|hey|what|why|how|where|who|which|when|tell|show|explain|about|skip)\b/i.test(name)||isModelingQuestion(raw)||hasKnownEntityAnswer(raw))return null;
  return name;
 }
 async function saveIntroduction(name){
+ const special=/^harini$/i.test(name.trim());
  aiRequest?.abort();
  const controller=new AbortController();
  aiRequest=controller;
  const version=++aiVersion;
  $('#ask-ai').disabled=true;
  $('#intent').textContent='SAVING NAME';
+ if(special)welcomeHarini();
  try{
   const response=await fetch('/api/visitor-name',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,consent:true}),signal:controller.signal});
   const data=await response.json();
@@ -235,10 +278,10 @@ async function saveIntroduction(name){
   finishIntroduction();
   $('#prompt').value='';
   renderEditor('');
-  $('#answer').textContent='Nice to meet you, '+name+'! What would you like to know about Pavan?';
+  if(!special)$('#answer').textContent='Nice to meet you, '+name+'! What would you like to know about Pavan?';
   $('#intent').textContent='NAME SAVED';
  }catch(error){
-  if(error.name!=='AbortError'&&version===aiVersion)$('#answer').textContent='Could not save your name. Try again, skip, or ask a question.';
+  if(error.name!=='AbortError'&&version===aiVersion){if(special)$('#intent').textContent='HELLO, HARINI / NAME NOT SAVED';else $('#answer').textContent='Could not save your name. Try again, skip, or ask a question.';}
  }finally{if(version===aiVersion)$('#ask-ai').disabled=!$('#prompt').value.trim();}
 }
 $('#visitor-skip').addEventListener('click',()=>{finishIntroduction();$('#prompt').value='';updatePrompt();$('#prompt').focus();});

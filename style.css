@@ -108,3 +108,12 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .career-preview{max-height:min(420px,55svh);overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#9eb087 transparent}
 .career-preview:focus-visible{outline:3px solid #bf6c36;outline-offset:4px}
 @media(max-width:760px){.career-preview{max-height:min(360px,50svh)}}
+
+.harini-welcome{position:relative;min-height:64px;padding:12px 0}
+.harini-welcome>p{position:relative;z-index:1}
+.heart-burst{position:absolute;left:50%;top:50%;pointer-events:none;z-index:2}
+.heart-burst>span{position:absolute;left:0;top:0;color:#cb5577;font-size:18px;line-height:1;opacity:0;animation:harini-heart-burst 1300ms ease-out var(--heart-delay) both}
+.heart-burst>span:nth-child(3n){color:#df8098;font-size:14px}
+.heart-burst>span:nth-child(3n+1){color:#ad4665;font-size:21px}
+@keyframes harini-heart-burst{0%{opacity:0;transform:translate(-50%,15px) scale(.3)}15%{opacity:1}75%{opacity:.8}100%{opacity:0;transform:translate(var(--heart-x),var(--heart-y)) rotate(var(--heart-turn)) scale(1)}}
+@media(prefers-reduced-motion:reduce){.heart-burst>span{animation:none;opacity:.55;transform:translate(calc(var(--heart-x)*.3),calc(var(--heart-y)*.3));font-size:12px}}
