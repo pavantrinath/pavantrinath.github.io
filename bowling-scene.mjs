@@ -6,7 +6,7 @@ export function initBowlingScene(root) {
   const replay = root.querySelector('button');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const get = name => svg.querySelector(`[data-part="${name}"]`);
-  const parts = Object.fromEntries(['head','hair','torso','left-arm','right-arm','left-leg','right-leg','ball','desk','seat','shadow','caption','crease'].map(n => [n, get(n)]));
+  const parts = Object.fromEntries(['head','torso','left-arm','right-arm','left-leg','right-leg','ball','desk','seat','shadow','caption','crease'].map(n => [n, get(n)]));
   let frame = 0, started = 0;
   const mix = (a,b,t) => a.map((v,i) => v+(b[i]-v)*t);
   const ease = t => t*t*(3-2*t);
@@ -20,17 +20,48 @@ export function initBowlingScene(root) {
     stand: [0,78, 0,50, 0,36, -8,66,-4,79, 9,64,8,79, -5,94,-8,111, 6,95,9,111],
     sit: [0,84, -2,57, 0,43, 10,72,28,73, 11,72,32,73, 18,85,19,109, 22,87,25,109]
   };
+  // Shorter legs, with a fixed-length thigh and shin instead of stretching
+  // each joint independently. The feet alternate contact with the ground.
+  for (const pose of Object.values(poses)) {
+    const hip = pose[1];
+    for (let i=1;i<14;i+=2) pose[i]+=5;
+    for (let i=14;i<22;i+=2) {
+      pose[i]*=.65;
+      pose[i+1]=hip+5+(pose[i+1]-hip)*.85;
+    }
+  }
+  function gait(ms, walking=false) {
+    const pose=[...(walking?poses.stand:poses.run)];
+    const phase=ms/(walking?160:105);
+    pose[1]-=Math.abs(Math.sin(phase))*(walking?.5:1.5);
+    const bounce=pose[1]-(walking?poses.stand[1]:poses.run[1]);
+    for(let i=3;i<14;i+=2)pose[i]+=bounce;
+    for(const [offset,shift] of [[14,0],[18,Math.PI]]) {
+      const angle=phase+shift;
+      const fx=Math.cos(angle)*(walking?7:12);
+      const fy=112-Math.max(0,Math.sin(angle))*(walking?5:12);
+      const dx=fx-pose[0],dy=fy-pose[1],distance=Math.hypot(dx,dy);
+      const along=(17*17-16*16+distance*distance)/(2*distance);
+      const bend=Math.sqrt(Math.max(0,17*17-along*along));
+      pose[offset]=pose[0]+dx/distance*along+dy/distance*bend;
+      pose[offset+1]=pose[1]+dy/distance*along-dx/distance*bend;
+      pose[offset+2]=fx;pose[offset+3]=fy;
+    }
+    // A compact opposing arm swing, with the bowling hand carrying the ball.
+    const swing=Math.sin(phase)*(walking?4:7);
+    pose[6]+=swing;pose[8]+=swing;
+    pose[10]-=swing;pose[12]-=swing;
+    return pose;
+  }
   function draw(ms) {
     let pose, x, ball = null;
     if (ms < 2600) {
-      const t=ms/2600, stride=Math.sin(ms/115);
-      pose=[...poses.run];
-      pose[10]+=stride*8;pose[12]-=stride*8;pose[14]+=stride*13;pose[16]+=stride*16;pose[18]-=stride*13;pose[20]-=stride*16;
-      pose=pose.map((n,i)=>i%2 ? n-Math.abs(stride)*4:n);
+      const t=ms/2600;
+      pose=gait(ms);
       x=32+t*92;
       ball=[x+pose[12],pose[13]];
     } else if(ms<3200) {
-      pose=mix(poses.run,poses.bound,ease((ms-2600)/600));x=124+(ms-2600)/600*18;ball=[x+pose[12],pose[13]];
+      pose=mix(gait(2600),poses.bound,ease((ms-2600)/600));x=124+(ms-2600)/600*18;ball=[x+pose[12],pose[13]];
     } else if(ms<3650) {
       pose=mix(poses.bound,poses.coil,ease((ms-3200)/450));x=142;ball=[x+pose[12],pose[13]];
     } else if(ms<4050) {
@@ -38,12 +69,13 @@ export function initBowlingScene(root) {
     } else if(ms<4700) {
       const t=(ms-4050)/650;
       pose=mix(poses.release,poses.follow,ease(t));x=142;
-      ball=[162+t*180,9+t*90*t];
+      ball=[162+t*180,14+t*90*t];
     } else if(ms<5350) {
       pose=mix(poses.follow,poses.stand,ease((ms-4700)/650));x=142;
     } else if(ms<6600) {
-      const t=(ms-5350)/1250, stride=Math.sin(t*Math.PI*6);
-      pose=[...poses.stand];pose[14]+=stride*7;pose[16]+=stride*8;pose[18]-=stride*7;pose[20]-=stride*8;
+      const t=(ms-5350)/1250;
+      const blend=Math.min(1,t*8,(1-t)*8);
+      pose=mix(poses.stand,gait(ms-5350,true),ease(blend));
       x=142+ease(t)*58;
     } else {
       pose=mix(poses.stand,poses.sit,ease(Math.min(1,(ms-6600)/600)));x=200;
@@ -51,13 +83,12 @@ export function initBowlingScene(root) {
     }
     const [hx,hy,sx,sy,cx,cy,rex,rey,rhx,rhy,lex,ley,lhx,lhy,rkx,rky,rfx,rfy,lkx,lky,lfx,lfy]=pose;
     const path=(name,points)=>parts[name].setAttribute('d',points.map(([px,py],i)=>`${i?'L':'M'}${x+px} ${py}`).join(' '));
-    path('torso',[[hx,hy],[sx,sy]]);
+    path('torso',[[hx,hy],[sx,sy],[cx,cy+7.5]]);
     path('right-arm',[[sx,sy],[rex,rey],[rhx,rhy]]);
     path('left-arm',[[sx,sy],[lex,ley],[lhx,lhy]]);
     path('right-leg',[[hx,hy],[rkx,rky],[rfx,rfy],[rfx+7,rfy]]);
     path('left-leg',[[hx,hy],[lkx,lky],[lfx,lfy],[lfx+7,lfy]]);
     parts.head.setAttribute('cx',x+cx);parts.head.setAttribute('cy',cy);
-    parts.hair.setAttribute('d',`M${x+cx-7} ${cy-2} Q${x+cx-6} ${cy-12} ${x+cx+5} ${cy-7}`);
     parts.shadow.setAttribute('cx',x+3);
     parts.ball.setAttribute('opacity',ball?1:0);
     if(ball){parts.ball.setAttribute('cx',ball[0]);parts.ball.setAttribute('cy',ball[1]);}
