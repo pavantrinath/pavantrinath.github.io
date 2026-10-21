@@ -1,6 +1,6 @@
 // Verified portfolio answers shared by the browser and the model context.
 export const FACTS = {
-  greeting: 'Hello! Who are you!',
+  greeting: 'Hello! I’m Atom, here to introduce Pavan. Who are you!',
   bot: 'I’m Atom, the AI assistant for this portfolio.',
   fandom: 'Pavan loves Rajinikanth. In Pavan’s personal fan ranking, he is god. Apparently even the foundation models report to Thalaivar.',
   movie: 'Pavan’s favorite movie is I, Robot. It got him hooked on AI and robotics. A robot movie became a career plan; subtle foreshadowing.',
@@ -18,7 +18,7 @@ export const FACTS = {
   experience: 'Pavan’s career: Capgemini (October 2015–February 2016), eBay (February 2016–September 2024), Liftoff (September 2024–April 2025), xAI (May–December 2025), and Robinhood (December 2025–present).',
   capgemini: 'Pavan was a Developer / Consultant at Capgemini US LLC from October 2015 to February 2016, working on provisioning as a service using Mistral and StackStorm and observability.',
   unknownfact: 'That detail about Pavan is not supplied in his public portfolio. Please contact Pavan at pavantrinath@gmail.com.',
-  unrelated: 'It’s not possible to answer that here. Please ask something about Pavan.'
+  unrelated: 'I can help with Pavan’s work, interests, or modeling questions related to his experience.'
 };
 
 // Match the requested relationship before broad topic words such as “team”.

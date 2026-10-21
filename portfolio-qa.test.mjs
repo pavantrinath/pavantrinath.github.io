@@ -61,7 +61,7 @@ test('greetings render without a biography or entity annotations, including subm
     $('#prompt').value = greeting;
     run.updatePrompt(true);
     await run.askAI();
-    assert.match($('#answer').innerHTML, /Hello! Who are you!/);
+    assert.match($('#answer').innerHTML, /Hello! I’m Atom, here to introduce Pavan/);
     assert.doesNotMatch($('#answer').innerHTML, /class="entity"|input-entities|Robinhood|Vutukuru/);
   }
   $('#prompt').value='Which cricket league does he play in?';
@@ -173,6 +173,20 @@ test('main input accepts names while questions skip introduction',()=>{
  assert.equal(parse("I'm Zoë"),'Zoë');
  assert.equal(parse('My name is José'),'José');
  for(const q of ['What do you do?','How do transformers work?','contact','Hi!','<img>']) assert.equal(parse(q),null,q);
+});
+
+test('Atom introduces Pavan consistently rather than claiming his experience',async()=>{
+ const code=source.slice(source.indexOf('function responseFor('),source.indexOf('function annotateInput('));
+ const respond=vm.runInNewContext(code+';responseFor',{FACTS,jobs:{},annotateInput:s=>s,entity:s=>s,careerLink:()=>''});
+ for(const intent of ['speaking','skills','build','nlp','recommenders','posttraining','frontiers','multimodal','personal','family','pizza','opensource','reviewing','writing','coffee']){
+   const reply=respond(intent);
+   assert.match(reply,/Pavan|his|he|He/,'subject for '+intent);
+   assert.doesNotMatch(reply,/I(?:’|')ve worked|I review|I(?:’|')m looking to contribute|my experience|my plate|My attention|I have seen|Send it my way/);
+ }
+ assert.match(FACTS.greeting,/I’m Atom.*introduce Pavan/);
+ const {SYSTEM_CONTEXT}=await import('./worker/portfolio-context.mjs');
+ assert.match(SYSTEM_CONTEXT,/I, me, and my refer to Atom/);
+ assert.match(SYSTEM_CONTEXT,/Never speak in Pavan’s first person/);
 });
 
 test('work answers precede their graph and the witty pointer directs visitors below',async()=>{

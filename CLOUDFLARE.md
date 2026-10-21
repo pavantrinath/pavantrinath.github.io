@@ -76,3 +76,7 @@ The shared portfolio-architectures.mjs catalog groups these into ranking/tabular
 ## Answer-first career presentation
 
 Work, jobs, research, and architecture answers appear above the interactive timeline with a short witty pointer to the chart below. Regular personal/content answers stay text-only. Existing local intent rules cover direct matches. A Workers AI BGE-small classifier supplements them for paraphrases: it reuses each query embedding and lazily embeds 16 example questions once per isolate, requiring cosine similarity at least 0.76 and a 0.06 margin over regular-content examples before selecting career presentation. Classifier failures fall back to the local presentation rules. It only chooses UI presentation; it does not authorize questions or change factual claims. Cloudflare Neurons are the AI usage unit, not a classifier product name.
+
+## Narrator voice
+
+Atom is the first-person narrator introducing Pavan. “I”, “me”, and “my” refer to Atom; Pavan’s career, experience, family, architecture work, and opinions use “Pavan”, “he”, or “his”. Local replies, chart pointers, architecture knowledge cards, the landing introduction, and model instructions share that rule. The name prompt introduces Atom before asking about the visitor. Technical recommendations may use Atom’s first-person guidance without claiming Pavan’s work as Atom’s. Email-composer draft text remains in the visitor’s voice.

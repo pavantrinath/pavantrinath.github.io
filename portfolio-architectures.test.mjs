@@ -22,7 +22,7 @@ test('timeline branch families render hands-on and related knowledge with refere
  assert.match(ranking,/MaskNet/);
  assert.match(ranking,/PLUM/);
  assert.match(ranking,/HSTU/);
- assert.match(ranking,/My view:/);
+ assert.match(ranking,/Pavan’s view:/);
  assert(!ARCHITECTURE_FAMILIES.generative.worked.includes('HSTU'));
  assert.match(ARCHITECTURE_CONTEXT,/explicitly confirmed PLUM/);
  assert.match(ranking,/rel="noopener noreferrer"/);
