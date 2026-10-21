@@ -19,3 +19,13 @@ test('escapes user/model markup and links without allowing HTML execution', () =
 test('matches whole mentions without highlighting parts of other words', () => {
   assert.equal(entityMentions('Chicago ongoing gopher javaish lets go outside').length,0);
 });
+
+test('labels foods, drinks, places and objects by their specific type', () => {
+  assert.deepEqual(entityMentions('Indian pizza, coffee and a laptop on the beach near San Francisco.').map(m=>[m.text,m.type]), [
+    ['Indian pizza','FOOD'],['coffee','DRINK'],['laptop','OBJECT'],['the beach','LOCATION'],['San Francisco','LOCATION']
+  ]);
+  assert.deepEqual(entityMentions('A coffee mug, cricket ball and robot in Dallas.').map(m=>[m.text,m.type]), [
+    ['coffee mug','OBJECT'],['cricket ball','OBJECT'],['robot','OBJECT'],['Dallas','LOCATION']
+  ]);
+  assert.equal(entityMentions('teaching keyboardist pizzazz').length, 0);
+});

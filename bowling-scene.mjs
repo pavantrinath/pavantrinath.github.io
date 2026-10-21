@@ -6,17 +6,17 @@ export function initBowlingScene(root) {
   const replay = root.querySelector('button');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const get = name => svg.querySelector(`[data-part="${name}"]`);
-  const parts = Object.fromEntries(['head','torso','left-arm','right-arm','left-leg','right-leg','ball','desk','seat','shadow','caption','crease'].map(n => [n, get(n)]));
+  const parts = Object.fromEntries(['head','eye','torso','left-arm','right-arm','left-leg','right-leg','ball','desk','seat','shadow','caption','crease'].map(n => [n, get(n)]));
   let frame = 0, started = 0;
   const mix = (a,b,t) => a.map((v,i) => v+(b[i]-v)*t);
   const ease = t => t*t*(3-2*t);
   // hip, shoulder, head, right elbow/hand, left elbow/hand, knees/feet
   const poses = {
     run: [0,79, 5,52, 7,39, -6,62,-15,51, 18,62,26,47, -13,94,-24,108, 16,94,29,101],
-    bound: [0,68, 1,41, 1,28, 17,30,20,12, -13,27,-15,8, -4,87,-20,96, 21,78,23,95],
-    coil: [0,78, 0,49, 0,35, 16,45,22,29, -15,38,-11,18, -16,92,-25,109, 18,94,29,110],
-    release: [0,78, 10,49, 13,35, 25,64,23,78, 7,25,20,9, -12,96,-23,111, 19,94,31,111],
-    follow: [0,78, 24,58, 31,46, 28,76,37,88, 40,67,48,82, -12,93,-24,109, 16,96,24,111],
+    bound: [0,68, 3,41, 5,28, 13,30,17,13, -13,53,-20,63, -4,87,-20,96, 21,78,23,95],
+    coil: [0,78, 2,49, 4,35, 16,35,20,18, -18,37,-12,18, 16,94,28,111, -13,92,-22,108],
+    release: [0,78, 9,49, 13,35, 19,65,12,78, 5,26,17,9, 17,94,29,111, -12,92,-22,108],
+    follow: [4,78, 26,58, 32,46, 24,76,13,86, 38,72,21,87, 18,94,29,111, -10,88,-20,76],
     stand: [0,78, 0,50, 0,36, -8,66,-4,79, 9,64,8,79, -5,94,-8,111, 6,95,9,111],
     sit: [0,84, -2,57, 0,43, 10,72,28,73, 11,72,32,73, 18,85,19,109, 22,87,25,109]
   };
@@ -38,7 +38,9 @@ export function initBowlingScene(root) {
     for(let i=3;i<14;i+=2)pose[i]+=bounce;
     for(const [offset,shift] of [[14,0],[18,Math.PI]]) {
       const angle=phase+shift;
-      const fx=Math.cos(angle)*(walking?7:12);
+      // Swinging feet travel forward; planted feet move backward relative
+      // to the advancing hips. The old sign made the figure moonwalk.
+      const fx=-Math.cos(angle)*(walking?7:6);
       const fy=112-Math.max(0,Math.sin(angle))*(walking?5:12);
       const dx=fx-pose[0],dy=fy-pose[1],distance=Math.hypot(dx,dy);
       const along=(17*17-16*16+distance*distance)/(2*distance);
@@ -49,8 +51,8 @@ export function initBowlingScene(root) {
     }
     // A compact opposing arm swing, with the bowling hand carrying the ball.
     const swing=Math.sin(phase)*(walking?4:7);
-    pose[6]+=swing;pose[8]+=swing;
-    pose[10]-=swing;pose[12]-=swing;
+    pose[6]-=swing;pose[8]-=swing;
+    pose[10]+=swing;pose[12]+=swing;
     return pose;
   }
   function draw(ms) {
@@ -69,7 +71,7 @@ export function initBowlingScene(root) {
     } else if(ms<4700) {
       const t=(ms-4050)/650;
       pose=mix(poses.release,poses.follow,ease(t));x=142;
-      ball=[162+t*180,14+t*90*t];
+      ball=[159+t*180,14+t*90*t];
     } else if(ms<5350) {
       pose=mix(poses.follow,poses.stand,ease((ms-4700)/650));x=142;
     } else if(ms<6600) {
@@ -89,6 +91,7 @@ export function initBowlingScene(root) {
     path('right-leg',[[hx,hy],[rkx,rky],[rfx,rfy],[rfx+7,rfy]]);
     path('left-leg',[[hx,hy],[lkx,lky],[lfx,lfy],[lfx+7,lfy]]);
     parts.head.setAttribute('cx',x+cx);parts.head.setAttribute('cy',cy);
+    parts.eye.setAttribute('cx',x+cx+3);parts.eye.setAttribute('cy',cy-1);
     parts.shadow.setAttribute('cx',x+3);
     parts.ball.setAttribute('opacity',ball?1:0);
     if(ball){parts.ball.setAttribute('cx',ball[0]);parts.ball.setAttribute('cy',ball[1]);}
