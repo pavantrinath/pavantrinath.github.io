@@ -78,13 +78,19 @@ test('chat UI uses Atom and has no Gemini branding', async () => {
   assert.match(source, /ASKING ATOM/);
 });
 
-test('draft typing waits for submission instead of showing a refusal', () => {
+test('draft typing waits for submission instead of showing a refusal', async () => {
+ const {renderEntities,entityMentions}=await import('./portfolio-entities.mjs');
  const nodes=new Map();
  const $=s=>{if(!nodes.has(s))nodes.set(s,{value:'',textContent:'',innerHTML:'',replaceChildren(){}});return nodes.get(s)};
  $('#prompt').value='Tell me';
- const fn=source.slice(source.indexOf('function updatePrompt('),source.indexOf('function applyCorrection('));
- const update=vm.runInNewContext(fn+';updatePrompt',{$,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
+ const fn=source.slice(source.indexOf('function draftMarkup('),source.indexOf('function applyCorrection('));
+ const update=vm.runInNewContext(fn+';updatePrompt',{$,annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
  update();
- assert.equal($('#answer').textContent,'Ready when you are. Press Send or Enter.');
+ assert.match($('#answer').innerHTML,/typing-wait/);
+ assert.doesNotMatch($('#answer').innerHTML,/not possible/);
+ $('#prompt').value='Tell me about Pavan ';
+ update();
+ assert.match($('#answer').innerHTML,/data-type="PERSON"/);
+ assert.doesNotMatch($('#answer').innerHTML,/typing-wait/);
  assert.equal($('#ask-ai').disabled,false);
 });

@@ -45,3 +45,12 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .entity[data-type="OBJECT"]{background:#f0e5dc;border-color:#cbb7a6}
 
 #ask-ai{flex-shrink:0;border:0;border-radius:5px;background:var(--green);color:var(--paper);padding:10px 12px;font-size:13px;white-space:nowrap}#ask-ai:disabled{cursor:default;opacity:.5}
+
+/* Quiet activity while composing; stop once a recognized entity appears. */
+.typing-wait{display:inline-flex;align-items:center;gap:5px;min-height:26px;padding:6px 0}
+.typing-wait>span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:typing-pulse 1.2s ease-in-out infinite}
+.typing-wait>span:nth-child(2){animation-delay:.15s}
+.typing-wait>span:nth-child(3){animation-delay:.3s}
+.draft-entities:empty{display:none}
+@keyframes typing-pulse{0%,70%,100%{opacity:.25;transform:translateY(0)}35%{opacity:.9;transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.typing-wait>span{animation:none;opacity:.6}}
