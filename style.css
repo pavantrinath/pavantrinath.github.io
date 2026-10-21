@@ -78,3 +78,17 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .visitor-form input{flex:1;min-width:100px;width:100px;padding:7px;border:1px solid var(--line);border-radius:4px;background:#fffef8;color:var(--ink);font:16px var(--font-sans)}
 .visitor-form button{padding:7px 10px;border:1px solid var(--line);border-radius:5px;background:#e0edc5;font-size:12px}
 .visitor-form button:disabled{opacity:.5}
+
+.career-preview{margin:12px 0 20px;padding:14px 10px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.career-preview>h3{font-size:15px;font-weight:600;margin:0 4px}
+.career-preview .timeline{height:135px;margin:6px 12px 12px 6px}
+.career-preview .job{min-width:48px}
+.career-preview .job-name{font-size:11px}
+.career-preview .job small{font-size:8px}
+.career-preview .job-detail{padding:12px}
+.career-preview .job-overview{display:block}
+.career-preview .job-overview h3{font-size:16px;margin:7px 0}
+.career-preview .job-overview>p{margin:7px 0}
+.career-preview .branch-buttons{gap:4px}
+.career-preview .branch-buttons button{padding:8px 3px;font-size:10px}
+.career-preview>.inline-link{margin:12px 4px 0;text-align:left}

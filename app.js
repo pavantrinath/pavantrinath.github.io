@@ -13,8 +13,52 @@ liftoff:{period:'SEP 2024 — APR 2025',title:'Staff ML Engineer · Liftoff',sum
 xai:{period:'MAY — DEC 2025',title:'Member of Technical Staff · xAI',summary:'Foundation models, generative recommenders, and post-training RL.',branches:[{name:'Generative recommenders',skills:'Autoregressive ranking · retrieval',detail:'Generative recommendation and retrieval, including autoregressive ranking and RQ-VAE semantic IDs.'},{name:'Foundation models',skills:'Transformers · applied AI',detail:'Applied foundation models to recommendation and commerce problems.'},{name:'Post-training',skills:'RL · data · evaluations',detail:'Post-training reinforcement learning, training data, and evaluation for commerce applications.'}]},
 robinhood:{period:'DEC 2025 — PRESENT',title:'Applied AI Lead / Staff ML Engineer · Robinhood',summary:'TL, modeling for agentic trading and Cortex assistant. Foundation models, fine-tuning, RL, and generative recommenders.',branches:[{name:'Learning & personalization',skills:'Foundation models · fine-tuning · RL',detail:'Foundation models, fine-tuning, reinforcement learning, and generative recommendation systems.'},{name:'Agentic trading',skills:'TL, modeling · agents · reasoning · tools',detail:'TL, modeling. Contributed to building agentic trading, including reasoning and tool orchestration.'},{name:'Cortex assistant',skills:'TL, modeling · memory · retrieval · evaluations',detail:'TL, modeling. Contributed to building Cortex assistant, including long-context reasoning, personalized experiences, evaluation, and model routing.'}]}}
 let selectedJob='robinhood';
-function showBranch(key,index){const j=jobs[key],branch=j.branches[index];$('#branch-detail').innerHTML=`<p>${branch.detail}</p><span class="branch-skills">${branch.skills}</span>`;document.querySelectorAll('[data-branch]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.branch===index)))}
-function showJob(key){selectedJob=key;const j=jobs[key];document.querySelectorAll('[data-job]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.job===key));b.setAttribute('aria-expanded',String(b.dataset.job===key));b.setAttribute('aria-controls','job-detail')});$('#job-detail').innerHTML=`<div class="job-overview"><span class="eyebrow">${j.period}</span><h3>${j.title}</h3><p>${j.summary}</p></div><div class="branch-tree"><svg viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true"><path d="M300 0V12 C300 35 100 22 100 65 M300 12V65 M300 12C300 35 500 22 500 65"/><circle cx="300" cy="4" r="4"/></svg><div class="branch-buttons">${j.branches.map((branch,i)=>`<button data-branch="${i}" aria-pressed="${i===0}">${branch.name}</button>`).join('')}</div><div id="branch-detail" aria-live="polite"></div></div>`;document.querySelectorAll('[data-branch]').forEach(b=>b.addEventListener('click',()=>showBranch(key,+b.dataset.branch)));showBranch(key,0)}document.querySelectorAll('[data-job]').forEach(b=>b.addEventListener('click',()=>showJob(b.dataset.job)));showJob('robinhood');
+function showBranch(key,index,root=$('#experience'),branchId='branch-detail'){
+ const branch=jobs[key].branches[index];
+ root.querySelector('#'+branchId).innerHTML=`<p>${branch.detail}</p><span class="branch-skills">${branch.skills}</span>`;
+ root.querySelectorAll('[data-branch]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.branch===index)));
+}
+function showJob(key,root=$('#experience'),detailId='job-detail',branchId='branch-detail'){
+ if(root===$('#experience'))selectedJob=key;
+ const j=jobs[key];
+ root.querySelectorAll('[data-job]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.job===key));b.setAttribute('aria-expanded',String(b.dataset.job===key));b.setAttribute('aria-controls',detailId)});
+ root.querySelector('#'+detailId).innerHTML=`<div class="job-overview"><span class="eyebrow">${j.period}</span><h3>${j.title}</h3><p>${j.summary}</p></div><div class="branch-tree"><svg viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true"><path d="M300 0V12 C300 35 100 22 100 65 M300 12V65 M300 12C300 35 500 22 500 65"/><circle cx="300" cy="4" r="4"/></svg><div class="branch-buttons">${j.branches.map((branch,i)=>`<button data-branch="${i}" aria-pressed="${i===0}">${branch.name}</button>`).join('')}</div><div id="${branchId}" aria-live="polite"></div></div>`;
+ root.querySelectorAll('[data-branch]').forEach(b=>b.addEventListener('click',()=>showBranch(key,+b.dataset.branch,root,branchId)));
+ showBranch(key,0,root,branchId);
+}
+$('#experience').querySelectorAll('[data-job]').forEach(b=>b.addEventListener('click',()=>showJob(b.dataset.job)));
+showJob('robinhood');
+function shouldShowCareer(raw){
+ const intent=classify(normalizePrompt(raw).corrected);
+ if(['unknownfact','sponsorship','guardrail','greeting','bot'].includes(intent))return false;
+ return ['experience','currentrole','leadership','build','skills','nlp','recommenders','posttraining','frontiers','multimodal','opensource',...Object.keys(jobs)].includes(intent)
+   || /\b(?:what|tell|describe|show|about)\b.*\b(?:work|career|jobs?|experience)\b/i.test(raw);
+}
+function showCareerPreview(raw){
+ const root=$('#chat-career');
+ root.hidden=!shouldShowCareer(raw);
+ if(root.hidden){root.replaceChildren();return;}
+ const heading=document.createElement('h3');
+ heading.textContent='Pavan’s work, at a glance';
+ const timeline=$('#experience .timeline').cloneNode(true);
+ const detail=document.createElement('article');
+ detail.id='chat-job-detail';
+ detail.className='job-detail';
+ const link=document.createElement('button');
+ link.type='button';
+ link.className='inline-link';
+ link.textContent='Explore the full experience timeline ↗';
+ link.addEventListener('click',()=>{
+  const selected=root.querySelector('[data-job][aria-pressed="true"]');
+  showJob(selected?.dataset.job||'robinhood');
+  setView('experience',true);
+ });
+ root.replaceChildren(heading,timeline,detail,link);
+ const initial=classify(normalizePrompt(raw).corrected);
+ const key=jobs[initial]?initial:'robinhood';
+ root.querySelectorAll('[data-job]').forEach(b=>b.addEventListener('click',()=>showJob(b.dataset.job,root,'chat-job-detail','chat-branch-detail')));
+ showJob(key,root,'chat-job-detail','chat-branch-detail');
+}
 const escapeHTML=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function entity(text,type,href){const value=escapeHTML(text);return`<span class="entity" data-type="${type}"><small>${type}</small>${href?`<a href="${href}">${value} ↗</a>`:value}</span>`}
 const corrections={contcat:'contact',contat:'contact',conatct:'contact',cotnact:'contact',emial:'email',eamil:'email',experiance:'experience',experince:'experience',skils:'skills',skillz:'skills',robinhod:'robinhood',writting:'writing',gaurdrails:'guardrails',gaurdrail:'guardrail',pavann:'pavan'};
@@ -33,7 +77,7 @@ function renderEditor(raw){
   mirror.innerHTML=annotateInput(raw);
   mirror.style.transform='translateX(-'+$('#prompt').scrollLeft+'px)';
 }
-function updatePrompt(submitted=false){aiRequest?.abort();aiVersion++;$('#ask-ai').disabled=!$('#prompt').value.trim();$('#ask-ai').textContent='↑';const raw=$('#prompt').value;renderEditor(raw);const{corrected,edits}=normalizePrompt(raw);const intent=submitted?classify(corrected):'idle';$('#visitor-form').hidden=!(submitted&&intent==='greeting');$('#intent').textContent=intent==='idle'?'AWAITING TOKENS':`INTENT / ${intent.toUpperCase()}`;$('#mascot-note').textContent=intent==='guardrail'?'boundaries are a feature.':intent==='contact'?'NERvous? just say hello.':'small model. large opinions.';if(submitted){$('#answer').innerHTML=`<div>${submitted&&raw&&intent!=='greeting'&&intent!=='bot'?`<div class="input-entities">${annotateInput(corrected)}</div>`:''}<p>${responseFor(intent)}</p></div>`;highlightEntities($('#answer'));}else{$('#answer').innerHTML=draftMarkup(raw);}$('#correction').replaceChildren();if(edits.length){const label=document.createElement('span');label.textContent='Did you mean';const b=document.createElement('button');b.textContent=edits.map(e=>e[1]).join(', ');b.addEventListener('click',applyCorrection);$('#correction').append(label,b,document.createTextNode('? Tab to accept.'))}const n=raw.trim()?Math.ceil(raw.trim().length/4):0;$('#token-count').textContent=`${n} tokens, approximately.`;document.querySelectorAll('[data-compose]').forEach(b=>b.addEventListener('click',openComposer));document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.selectJob)showJob(b.dataset.selectJob);setView(b.dataset.open)}))}
+function updatePrompt(submitted=false){aiRequest?.abort();aiVersion++;$('#ask-ai').disabled=!$('#prompt').value.trim();$('#ask-ai').textContent='↑';const raw=$('#prompt').value;if(submitted)showCareerPreview(raw);else{$('#chat-career').hidden=true;}renderEditor(raw);const{corrected,edits}=normalizePrompt(raw);const intent=submitted?classify(corrected):'idle';$('#visitor-form').hidden=!(submitted&&intent==='greeting');$('#intent').textContent=intent==='idle'?'AWAITING TOKENS':`INTENT / ${intent.toUpperCase()}`;$('#mascot-note').textContent=intent==='guardrail'?'boundaries are a feature.':intent==='contact'?'NERvous? just say hello.':'small model. large opinions.';if(submitted){$('#answer').innerHTML=`<div>${submitted&&raw&&intent!=='greeting'&&intent!=='bot'?`<div class="input-entities">${annotateInput(corrected)}</div>`:''}<p>${responseFor(intent)}</p></div>`;highlightEntities($('#answer'));}else{$('#answer').innerHTML=draftMarkup(raw);}$('#correction').replaceChildren();if(edits.length){const label=document.createElement('span');label.textContent='Did you mean';const b=document.createElement('button');b.textContent=edits.map(e=>e[1]).join(', ');b.addEventListener('click',applyCorrection);$('#correction').append(label,b,document.createTextNode('? Tab to accept.'))}const n=raw.trim()?Math.ceil(raw.trim().length/4):0;$('#token-count').textContent=`${n} tokens, approximately.`;document.querySelectorAll('[data-compose]').forEach(b=>b.addEventListener('click',openComposer));document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.selectJob)showJob(b.dataset.selectJob);setView(b.dataset.open)}))}
 function applyCorrection(){const p=$('#prompt');p.value=normalizePrompt(p.value).corrected;updatePrompt();p.focus()}
 $('#prompt').addEventListener('input',()=>{updatePrompt();scheduleDraftLookup();});$('#prompt').addEventListener('scroll',()=>renderEditor($('#prompt').value));$('#prompt').addEventListener('keydown',e=>{if(e.key==='Tab'&&normalizePrompt(e.target.value).edits.length){e.preventDefault();applyCorrection()}});$('#clear').addEventListener('click',()=>{$('#prompt').value='';updatePrompt();$('#prompt').focus()});document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{$('#prompt').value=b.dataset.prompt;updatePrompt();$('#prompt').focus()}));updatePrompt();
 
@@ -73,6 +117,7 @@ async function askAI(){
   const message=$('#prompt').value.trim();
   clearTimeout(draftTimer);
   if(!message)return;
+  showCareerPreview(message);
   if(!aiEnabled||hasKnownEntityAnswer(message)){updatePrompt(true);return;}
   if(['greeting','bot'].includes(classify(normalizePrompt(message).corrected))){updatePrompt(true);return;}
   aiRequest?.abort();

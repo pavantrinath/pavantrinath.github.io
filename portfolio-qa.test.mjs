@@ -52,7 +52,7 @@ test('greetings render without a biography or entity annotations, including subm
   const functions = source.slice(source.indexOf('function classify('), source.indexOf('function applyCorrection('));
   const submit = source.slice(source.indexOf('function hasKnownEntityAnswer('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
-    $, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
+    $, showCareerPreview:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
     highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
@@ -87,7 +87,7 @@ test('draft typing waits for submission instead of showing a refusal', async () 
  const $=s=>{if(!nodes.has(s))nodes.set(s,{value:'',style:{},scrollLeft:0,textContent:'',innerHTML:'',replaceChildren(){}});return nodes.get(s)};
  $('#prompt').value='Tell me';
  const fn=source.slice(source.indexOf('function draftMarkup('),source.indexOf('function applyCorrection('));
- const update=vm.runInNewContext(fn+';updatePrompt',{$,renderEditor:()=>{},annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
+ const update=vm.runInNewContext(fn+';updatePrompt',{$,showCareerPreview:()=>{},renderEditor:()=>{},annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
  update();
  assert.match($('#answer').innerHTML,/typing-wait/);
  assert.doesNotMatch($('#answer').innerHTML,/not possible/);
@@ -120,7 +120,7 @@ test('a prepared cache hit renders on Send without showing thinking or generatin
  const code=source.slice(source.indexOf('async function askAI('),source.indexOf("$('#ask-ai').addEventListener"));
  let calls=0;
  const run=vm.runInNewContext(code+';askAI',{
-   $,clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
+   $,showCareerPreview:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
    aiEnabled:true,aiRequest:null,aiVersion:0,hasKnownEntityAnswer:()=>false,classify:()=> 'unknown',normalizePrompt:corrected=>({corrected}),
    document:{createElement:()=>({append(){},set textContent(v){states.push(v)}})},renderEntities:s=>s,annotateInput:s=>s,
    fetch:()=>{calls++;throw Error('cache hit must not generate')}
@@ -129,4 +129,31 @@ test('a prepared cache hit renders on Send without showing thinking or generatin
  assert.equal(calls,0);
  assert(!states.includes('Atom is thinking…'));
  assert(states.includes('ANSWER / ATOM'));
+});
+
+test('work questions promote the career rendering, while greetings and personal questions do not',()=>{
+ const code=source.slice(source.indexOf('function shouldShowCareer('),source.indexOf('function showCareerPreview('));
+ const show=vm.runInNewContext(code+';shouldShowCareer',{classify,normalizePrompt:corrected=>({corrected}),jobs:{ebay:{},liftoff:{},xai:{},robinhood:{}}});
+ for(const q of ['What do you do?','What is your work?','Tell me about your career','What did he build at xAI?','What are your skills?'])assert.equal(show(q),true,q);
+ for(const q of ['Hi!','What is his salary?','What is his visa sponsorship status?','Which cricket league does he play in?'])assert.equal(show(q),false,q);
+});
+
+test('shared timeline renderer keeps chat and Experience selections independent',()=>{
+ const makeRoot=()=>{
+  const nodes=new Map();
+  const buttons=values=>values.map(value=>({dataset:value,attrs:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(type,fn){this.click=fn}}));
+  const jobs=buttons([{job:'ebay'},{job:'robinhood'}]),branches=buttons([{branch:'0'},{branch:'1'}]);
+  return {jobs,branches,querySelector(id){if(!nodes.has(id))nodes.set(id,{innerHTML:''});return nodes.get(id)},querySelectorAll(s){return s==='[data-job]'?jobs:branches}};
+ };
+ const page=makeRoot(),chat=makeRoot();
+ const jobs={ebay:{period:'2016',title:'eBay',summary:'NLP',branches:[{name:'Language',detail:'Translation',skills:'BERT'},{name:'Search',detail:'Indexing',skills:'NER'}]},robinhood:{period:'2025',title:'Robinhood',summary:'AI',branches:[{name:'Trading',detail:'Agentic trading',skills:'Agents'},{name:'Cortex',detail:'Cortex assistant',skills:'Memory'}]}};
+ const code=source.slice(source.indexOf('function showBranch('),source.indexOf("$('#experience').querySelectorAll"));
+ const show=vm.runInNewContext(code+';showJob',{$:()=>page,jobs,selectedJob:'robinhood'});
+ show('robinhood',page);
+ show('ebay',chat,'chat-job-detail','chat-branch-detail');
+ chat.branches[1].click();
+ assert.match(chat.querySelector('#chat-branch-detail').innerHTML,/Indexing/);
+ assert.match(page.querySelector('#branch-detail').innerHTML,/Agentic trading/);
+ assert.equal(chat.jobs[0].attrs['aria-controls'],'chat-job-detail');
+ assert.equal(page.jobs[1].attrs['aria-controls'],'job-detail');
 });
