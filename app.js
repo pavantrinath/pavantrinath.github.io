@@ -42,10 +42,16 @@ $('#close-compose').addEventListener('click',()=>$('#opportunity-dialog').close(
 $('#opportunity-dialog').addEventListener('click',e=>{if(e.target===$('#opportunity-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}});
 $('#opportunity-form').addEventListener('submit',e=>{e.preventDefault();const subject=$('#email-subject').value,message=$('#email-message').value;if(!subject.trim()||!message.trim()){$('#compose-status').textContent='Add a subject and a message first.';return}window.location.href=emailDraftURL(subject,message);$('#compose-status').textContent='Draft handed to your email app. Finish sending there; this site cannot confirm delivery.'});
 $('#copy-email').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('pavantrinath@gmail.com');$('#compose-status').textContent='Email address copied.'}catch{$('#compose-status').textContent='Copy this address: pavantrinath@gmail.com'}});
+function hasKnownEntityAnswer(raw){
+  const {corrected}=normalizePrompt(raw);
+  const intent=classify(corrected);
+  return !['idle','unknown','unknownfact','guardrail','about','greeting','bot'].includes(intent)
+    && entityMentions(corrected).some(mention=>!(mention.type==='PERSON'&&/^pavan(?: trinath(?: vutukuru)?)?$/i.test(mention.text)));
+}
 async function askAI(){
   const message=$('#prompt').value.trim();
   if(!message)return;
-  if(!aiEnabled){updatePrompt(true);return;}
+  if(!aiEnabled||hasKnownEntityAnswer(message)){updatePrompt(true);return;}
   if(['greeting','bot'].includes(classify(normalizePrompt(message).corrected))){updatePrompt(true);return;}
   aiRequest?.abort();
   const controller=new AbortController();

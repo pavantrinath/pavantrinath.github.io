@@ -42,7 +42,7 @@ test('Gemini uses the shared facts', async () => {
 
 
 test('greetings render without a biography or entity annotations, including submit', async () => {
-  const { renderEntities, highlightEntities } = await import('./portfolio-entities.mjs');
+  const { renderEntities, highlightEntities, entityMentions } = await import('./portfolio-entities.mjs');
   const nodes = new Map();
   const $ = selector => {
     if (!nodes.has(selector)) nodes.set(selector, { value: '', style:{}, scrollLeft:0, textContent: '', innerHTML: '', replaceChildren() {} });
@@ -50,9 +50,9 @@ test('greetings render without a biography or entity annotations, including subm
   };
   let calls = 0;
   const functions = source.slice(source.indexOf('function classify('), source.indexOf('function applyCorrection('));
-  const submit = source.slice(source.indexOf('async function askAI('), source.indexOf("$('#ask-ai').addEventListener"));
+  const submit = source.slice(source.indexOf('function hasKnownEntityAnswer('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
-    $, FACTS, matchQuestion, renderEntities,
+    $, FACTS, matchQuestion, renderEntities, entityMentions,
     highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
@@ -64,6 +64,9 @@ test('greetings render without a biography or entity annotations, including subm
     assert.match($('#answer').innerHTML, /Hi! How can I help/);
     assert.doesNotMatch($('#answer').innerHTML, /class="entity"|input-entities|Robinhood|Vutukuru/);
   }
+  $('#prompt').value='Which cricket league does he play in?';
+  await run.askAI();
+  assert.match($('#answer').innerHTML,/Indian Champs/);
   assert.equal(calls, 0);
   $('#prompt').value = 'Tell me about Pavan';
   run.updatePrompt(true);
@@ -100,4 +103,12 @@ test('draft typing waits for submission instead of showing a refusal', async () 
  update();
  assert.equal($('#answer').innerHTML,'');
  assert.equal($('#ask-ai').disabled,true);
+});
+
+test('known entity questions skip the model but names alone and unknown facts do not', async () => {
+ const {entityMentions}=await import('./portfolio-entities.mjs');
+ const code=source.slice(source.indexOf('function hasKnownEntityAnswer('),source.indexOf('async function askAI('));
+ const known=vm.runInNewContext(code+';hasKnownEntityAnswer',{classify,entityMentions,normalizePrompt:corrected=>({corrected})});
+ for(const q of ['Does he like I, Robot?', 'Does Pavan like Rajinikanth?', 'Which cricket league does he play in?', 'Tell me about his Robinhood work', 'What is his visa sponsorship status?']) assert.equal(known(q),true,q);
+ for(const q of ['Pavan','Tell me about Pavan','What is his coffee order?','Hi!','What is his favorite song?']) assert.equal(known(q),false,q);
 });
