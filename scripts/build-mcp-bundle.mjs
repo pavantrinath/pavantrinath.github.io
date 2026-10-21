@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = path => readFile(resolve(root, path), 'utf8');
 const assets = {};
-for (const [path, type] of [['index.html', 'text/html'], ['app.js', 'text/javascript'], ['portfolio-qa.mjs', 'text/javascript'], ['style.css', 'text/css']]) {
+for (const [path, type] of [['index.html', 'text/html'], ['app.js', 'text/javascript'], ['portfolio-qa.mjs', 'text/javascript'], ['bowling-scene.mjs', 'text/javascript'], ['style.css', 'text/css']]) {
   assets['/' + path] = { body: await read(path), type: type + '; charset=utf-8' };
 }
 const facts = (await read('portfolio-qa.mjs')).replace(/export /g, '');

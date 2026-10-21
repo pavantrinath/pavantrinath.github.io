@@ -27,3 +27,10 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .branch-buttons button,#opportunity-form input,#opportunity-form textarea{font-family:var(--font-sans)}
 @media(max-width:760px){.intro h1{font-size:clamp(32px,8.5vw,42px);letter-spacing:-.045em}.intro h1 br,.intro h1 br:first-of-type{display:block}.intro>p{font-size:14px}.intro>p>span{font-size:12px}.mascot{min-height:130px}.answer p{font-size:15px}.llm-bubble{padding:18px;margin-left:8px}.toy-top,.toy-top>span:last-child,.toy-bottom{font-family:var(--font-sans);font-size:10px}.toy-bottom{flex-wrap:wrap;gap:5px 12px}.input-entities{font-size:13px}}
 
+
+/* A finite, transparent vector vignette; no animated image download. */
+.bowling-scene{position:relative;width:min(100%,320px);margin:0 auto}
+.bowling-scene svg{display:block;width:100%;height:auto;overflow:visible}
+.scene-replay{position:absolute;top:0;right:0;border:0;background:transparent;color:var(--muted);font:11px/1.5 var(--font-sans);min-height:32px;padding:5px 8px;border-radius:16px}
+.scene-replay:hover{background:#dde2d2;color:var(--ink)}
+@media(prefers-reduced-motion:reduce){.scene-replay{display:none}}
