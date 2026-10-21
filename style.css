@@ -71,13 +71,6 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .input-wrap #prompt{padding:23px 0 5px}
 #prompt-mirror{top:18px;padding:5px 0}
 #ask-ai{padding:8px 11px}
-.visitor-form{margin:0 0 14px;padding:12px;border:1px solid var(--line);border-radius:7px}
-.visitor-form label{font-size:13px}
-.visitor-form p{font-size:11px;line-height:1.5;color:var(--muted);margin:5px 0 9px}
-.visitor-form>div{display:flex;gap:6px;flex-wrap:wrap}
-.visitor-form input{flex:1;min-width:100px;width:100px;padding:7px;border:1px solid var(--line);border-radius:4px;background:#fffef8;color:var(--ink);font:16px var(--font-sans)}
-.visitor-form button{padding:7px 10px;border:1px solid var(--line);border-radius:5px;background:#e0edc5;font-size:12px}
-.visitor-form button:disabled{opacity:.5}
 
 .career-preview{margin:12px 0 20px;padding:14px 10px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
 .career-preview>h3{font-size:15px;font-weight:600;margin:0 4px}
@@ -92,3 +85,5 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .career-preview .branch-buttons{gap:4px}
 .career-preview .branch-buttons button{padding:8px 3px;font-size:10px}
 .career-preview>.inline-link{margin:12px 4px 0;text-align:left}
+
+.visitor-notice{font:11px/1.5 var(--font-sans);color:var(--muted);margin:0 0 10px}

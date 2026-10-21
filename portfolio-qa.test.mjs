@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
-import { FACTS, matchQuestion } from './portfolio-qa.mjs';
+import { FACTS, matchQuestion, isModelingQuestion } from './portfolio-qa.mjs';
 const source = await readFile(new URL('./app.js', import.meta.url), 'utf8');
 const classify = vm.runInNewContext(source.slice(source.indexOf('function classify('), source.indexOf('function careerLink(')) + '; classify', { matchQuestion });
 const cases = {
@@ -52,7 +52,7 @@ test('greetings render without a biography or entity annotations, including subm
   const functions = source.slice(source.indexOf('function classify('), source.indexOf('function applyCorrection('));
   const submit = source.slice(source.indexOf('function hasKnownEntityAnswer('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
-    $, showCareerPreview:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
+    $, awaitingName:false, isModelingQuestion, showCareerPreview:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
     highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
@@ -61,7 +61,7 @@ test('greetings render without a biography or entity annotations, including subm
     $('#prompt').value = greeting;
     run.updatePrompt(true);
     await run.askAI();
-    assert.match($('#answer').innerHTML, /What’s your name/);
+    assert.match($('#answer').innerHTML, /Hello! Who are you!/);
     assert.doesNotMatch($('#answer').innerHTML, /class="entity"|input-entities|Robinhood|Vutukuru/);
   }
   $('#prompt').value='Which cricket league does he play in?';
@@ -87,7 +87,7 @@ test('draft typing waits for submission instead of showing a refusal', async () 
  const $=s=>{if(!nodes.has(s))nodes.set(s,{value:'',style:{},scrollLeft:0,textContent:'',innerHTML:'',replaceChildren(){}});return nodes.get(s)};
  $('#prompt').value='Tell me';
  const fn=source.slice(source.indexOf('function draftMarkup('),source.indexOf('function applyCorrection('));
- const update=vm.runInNewContext(fn+';updatePrompt',{$,showCareerPreview:()=>{},renderEditor:()=>{},annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
+ const update=vm.runInNewContext(fn+';updatePrompt',{$,awaitingName:false,showCareerPreview:()=>{},renderEditor:()=>{},annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
  update();
  assert.match($('#answer').innerHTML,/typing-wait/);
  assert.doesNotMatch($('#answer').innerHTML,/not possible/);
@@ -108,7 +108,7 @@ test('draft typing waits for submission instead of showing a refusal', async () 
 test('known entity questions skip the model but names alone and unknown facts do not', async () => {
  const {entityMentions}=await import('./portfolio-entities.mjs');
  const code=source.slice(source.indexOf('function hasKnownEntityAnswer('),source.indexOf('async function askAI('));
- const known=vm.runInNewContext(code+';hasKnownEntityAnswer',{classify,entityMentions,normalizePrompt:corrected=>({corrected})});
+ const known=vm.runInNewContext(code+';hasKnownEntityAnswer',{classify,isModelingQuestion,entityMentions,normalizePrompt:corrected=>({corrected})});
  for(const q of ['Does he like I, Robot?', 'Does Pavan like Rajinikanth?', 'Which cricket league does he play in?', 'Tell me about his Robinhood work', 'What is his visa sponsorship status?']) assert.equal(known(q),true,q);
  for(const q of ['Pavan','Tell me about Pavan','What is his coffee order?','Hi!','What is his favorite song?']) assert.equal(known(q),false,q);
 });
@@ -120,7 +120,7 @@ test('a prepared cache hit renders on Send without showing thinking or generatin
  const code=source.slice(source.indexOf('async function askAI('),source.indexOf("$('#ask-ai').addEventListener"));
  let calls=0;
  const run=vm.runInNewContext(code+';askAI',{
-   $,showCareerPreview:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
+   $,awaitingName:false,isModelingQuestion,showCareerPreview:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
    aiEnabled:true,aiRequest:null,aiVersion:0,hasKnownEntityAnswer:()=>false,classify:()=> 'unknown',normalizePrompt:corrected=>({corrected}),
    document:{createElement:()=>({append(){},set textContent(v){states.push(v)}})},renderEntities:s=>s,annotateInput:s=>s,
    fetch:()=>{calls++;throw Error('cache hit must not generate')}
@@ -156,4 +156,21 @@ test('shared timeline renderer keeps chat and Experience selections independent'
  assert.match(page.querySelector('#branch-detail').innerHTML,/Agentic trading/);
  assert.equal(chat.jobs[0].attrs['aria-controls'],'chat-job-detail');
  assert.equal(page.jobs[1].attrs['aria-controls'],'job-detail');
+});
+
+test('modeling questions route to the LLM and use updated Robinhood context',async()=>{
+ const {SYSTEM_CONTEXT}=await import('./worker/portfolio-context.mjs');
+ for(const q of ['How would you design a recommender?', 'Explain transformer training', 'How should I evaluate a ranking model?', 'How do you handle model inference latency?']) assert.equal(isModelingQuestion(q),true,q);
+ for(const q of ['What is your current role?', 'What did you do at Robinhood?', 'Hi!'])assert.equal(isModelingQuestion(q),false,q);
+ assert.match(FACTS.currentrole,/TL for personalization on homepage, search, and growth/);
+ assert.match(SYSTEM_CONTEXT,/TL for personalization on homepage, search, and growth/);
+ assert.match(SYSTEM_CONTEXT,/technical modeling questions/);
+});
+test('main input accepts names while questions skip introduction',()=>{
+ const code=source.slice(source.indexOf('function visitorNameFrom('),source.indexOf('async function saveIntroduction('));
+ const parse=vm.runInNewContext(code+';visitorNameFrom',{isModelingQuestion,hasKnownEntityAnswer:raw=>['contact','cricket'].includes(raw)});
+ assert.equal(parse('Jane Doe'),'Jane Doe');
+ assert.equal(parse("I'm Zoë"),'Zoë');
+ assert.equal(parse('My name is José'),'José');
+ for(const q of ['What do you do?','How do transformers work?','contact','Hi!','<img>']) assert.equal(parse(q),null,q);
 });

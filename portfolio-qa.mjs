@@ -1,16 +1,16 @@
 // Verified portfolio answers shared by the browser and the model context.
 export const FACTS = {
-  greeting: 'Hi! How can I help?',
+  greeting: 'Hello! Who are you!',
   bot: 'I’m Atom, the AI assistant for this portfolio.',
   fandom: 'Pavan loves Rajinikanth. In Pavan’s personal fan ranking, he is god. Apparently even the foundation models report to Thalaivar.',
   movie: 'Pavan’s favorite movie is I, Robot. It got him hooked on AI and robotics. A robot movie became a career plan; subtle foreshadowing.',
   sponsorship: 'Pavan will need visa sponsorship.',
   about: 'Pavan Trinath Vutukuru is an Applied AI Lead / Staff ML Engineer at Robinhood.',
-  currentrole: 'Pavan is Applied AI Lead / Staff ML Engineer at Robinhood, since December 2025. He is TL, modeling for agentic trading and Cortex assistant and contributed to building both.',
+  currentrole: 'Pavan is Applied AI Lead / Staff ML Engineer at Robinhood, since December 2025. He is TL, modeling for agentic trading and Cortex assistant and contributed to building both. He is also TL for personalization on homepage, search, and growth.',
   location: 'Pavan is based in the San Francisco Bay Area.',
   education: 'Pavan earned a master’s in Cognitive Science at the University of Texas at Dallas in July 2015 and a B.Tech in Computer Science at KL University in May 2013.',
   cricket: 'Pavan plays for Indian Champs in NACL (North American Cricket League). Indian Champs is the team; NACL is the league.',
-  leadership: 'At Robinhood, Pavan was selected within five months to provide technical leadership for a 14-engineer AI R&D team. He is TL, modeling for agentic trading and Cortex assistant; he contributed to building both.',
+  leadership: 'At Robinhood, Pavan was selected within five months to provide technical leadership for a 14-engineer AI R&D team. He is TL, modeling for agentic trading and Cortex assistant; he contributed to building both. He is also TL for personalization on homepage, search, and growth.',
   awards: 'Pavan received the eBay Critical Talent Award (top 1% performance), a Spot Award for Excellence for production description extraction, and the Best Idea Award for a model evaluation framework later adopted company-wide.',
   linkedin: 'Pavan’s LinkedIn: https://www.linkedin.com/in/pavantrinath.',
   github: 'Pavan’s GitHub: https://github.com/pavantrinath.',
@@ -49,3 +49,10 @@ export function matchQuestion(raw) {
   return null;
 }
 
+
+export function isModelingQuestion(raw){
+ const s=raw.toLowerCase();
+ const technical=/\b(?:model(?:ing|ling|s)?|machine learning|transformers?|embeddings?|recommend(?:er|ers|ation|ations)|ranking|retrieval|reinforcement learning|rl|sft|grpo|fine.tun(?:e|ing)|training|post.training|ner|bert|diffusion|feature engineering|loss functions?|evaluation|inference|neural|architecture)\b/.test(s);
+ const question=/\b(?:how|why|what|which|when|explain|compare|design|implement|train|tune|evaluate|should|can|help|debug|recommend|tell|describe)\b|\?/.test(s);
+ return technical&&(question||s.trim().split(/\s+/).length<=3);
+}
