@@ -16,23 +16,17 @@ function unitVector(value) {
   return norm ? value.map(x => x / norm) : null;
 }
 export class SemanticAnswerCache {
-  constructor({ capacity = 100, ttl = 3600000, threshold = 0.94, now = Date.now } = {}) {
+  constructor({ capacity = 100, threshold = 0.94 } = {}) {
     this.entries = new Map();
     this.capacity = capacity;
-    this.ttl = ttl;
     this.threshold = threshold;
-    this.now = now;
-  }
-  prune() {
-    for (const [key, entry] of this.entries) if (entry.expires <= this.now()) this.entries.delete(key);
   }
   async lookup(message, namespace, ai) {
-    this.prune();
     if (!cacheable(message)) return { skip: true };
     const key = namespace + ':' + normalizeQuery(message);
     const guard = queryGuard(message);
     const exact = this.entries.get(key);
-    if (exact) { exact.hits++; exact.used = this.now(); return { answer: exact.answer, hit: 'exact' }; }
+    if (exact) { this.entries.delete(key); this.entries.set(key, exact); return { answer: exact.answer, hit: 'exact' }; }
     let vector = null;
     if (ai) {
       let timer;
@@ -56,8 +50,8 @@ export class SemanticAnswerCache {
       matches.sort((a, b) => b.score - a.score);
       const best = matches[0];
       if (best && (!matches[1] || best.entry.answer === matches[1].entry.answer || best.score - matches[1].score >= 0.03)) {
-        best.entry.hits++;
-        best.entry.used = this.now();
+        this.entries.delete(best.entry.key);
+        this.entries.set(best.entry.key, best.entry);
         return { answer: best.entry.answer, hit: 'semantic' };
       }
     }
@@ -65,12 +59,10 @@ export class SemanticAnswerCache {
   }
   remember(ticket, answer) {
     if (!ticket.key || !answer) return;
-    this.prune();
-    const existing = this.entries.get(ticket.key);
-    this.entries.set(ticket.key, { ...ticket, answer, hits: (existing?.hits || 0) + 1, used: this.now(), expires: this.now() + this.ttl });
+    this.entries.delete(ticket.key);
+    this.entries.set(ticket.key, { ...ticket, answer });
     while (this.entries.size > this.capacity) {
-      const victim = [...this.entries].sort((a,b) => a[1].hits - b[1].hits || a[1].used - b[1].used)[0];
-      this.entries.delete(victim[0]);
+      this.entries.delete(this.entries.keys().next().value);
     }
   }
 }
