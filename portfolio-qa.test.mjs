@@ -59,14 +59,14 @@ test('greetings render without a biography or entity annotations, including subm
   });
   for (const greeting of ['Hi!', 'Hello!', 'Hey Atom!']) {
     $('#prompt').value = greeting;
-    run.updatePrompt();
+    run.updatePrompt(true);
     await run.askAI();
     assert.match($('#answer').innerHTML, /Hi! How can I help/);
     assert.doesNotMatch($('#answer').innerHTML, /class="entity"|input-entities|Robinhood|Vutukuru/);
   }
   assert.equal(calls, 0);
   $('#prompt').value = 'Tell me about Pavan';
-  run.updatePrompt();
+  run.updatePrompt(true);
   assert.match($('#answer').innerHTML, /data-type="PERSON"/);
   assert.match($('#answer').innerHTML, /Robinhood/);
 });
@@ -76,4 +76,15 @@ test('chat UI uses Atom and has no Gemini branding', async () => {
   assert.doesNotMatch(source + html, /gemini/i);
   assert.match(html, /Atom/);
   assert.match(source, /ASKING ATOM/);
+});
+
+test('draft typing waits for submission instead of showing a refusal', () => {
+ const nodes=new Map();
+ const $=s=>{if(!nodes.has(s))nodes.set(s,{value:'',textContent:'',innerHTML:'',replaceChildren(){}});return nodes.get(s)};
+ $('#prompt').value='Tell me';
+ const fn=source.slice(source.indexOf('function updatePrompt('),source.indexOf('function applyCorrection('));
+ const update=vm.runInNewContext(fn+';updatePrompt',{$,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
+ update();
+ assert.equal($('#answer').textContent,'Ready when you are. Press Send or Enter.');
+ assert.equal($('#ask-ai').disabled,false);
 });

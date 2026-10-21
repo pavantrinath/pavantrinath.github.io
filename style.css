@@ -43,3 +43,5 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .llm-bubble .entity small{margin:0;font:600 9px/1.3 var(--font-sans);letter-spacing:.07em}
 
 .entity[data-type="OBJECT"]{background:#f0e5dc;border-color:#cbb7a6}
+
+#ask-ai{flex-shrink:0;border:0;border-radius:5px;background:var(--green);color:var(--paper);padding:10px 12px;font-size:13px;white-space:nowrap}#ask-ai:disabled{cursor:default;opacity:.5}
