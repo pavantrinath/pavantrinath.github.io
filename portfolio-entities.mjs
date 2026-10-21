@@ -1,7 +1,7 @@
 // A shared display vocabulary for local answers, prompts and model replies.
 // Labels describe mentions in the text, not whether a model claim is verified.
 const vocabulary = {
-  PERSON: ['Rajinikanth', 'Rajnikanth', 'Rajini', 'Thalaivar', 'Pavan Trinath Vutukuru', 'Pavan Trinath', 'Pavan'],
+  PERSON: ['Harini', 'Rithansh Krathu', 'Rithansh', 'Rajinikanth', 'Rajnikanth', 'Rajini', 'Thalaivar', 'Pavan Trinath Vutukuru', 'Pavan Trinath', 'Pavan'],
   ORG: ['University of Texas at Dallas', 'UT Dallas', 'KL University', 'Capgemini US LLC', 'Capgemini', 'Robinhood', 'Liftoff', 'eBay', 'xAI', 'x AI'],
   LOCATION: ['San Francisco Bay Area', 'San Francisco', 'San Jose', 'Bay Area', 'Richardson', 'Dallas', 'Texas', 'California', 'United States', 'North America', 'India', 'Hyderabad', 'Bengaluru', 'Bangalore', 'New York', 'Seattle', 'London', 'the beach', 'beaches', 'beach'],
   'RESEARCH TOPIC': ['phrase-based machine translation', 'machine translation', 'foundation models', 'generative recommenders', 'generative recommendation', 'generative ranking', 'generative retrieval', 'looped transformers', 'physical intelligence', 'diffusion models', 'post-training RL', 'post-training', 'agentic RL', 'reinforcement learning', 'fine-tuning', 'long-context reasoning', 'sequential models', 'multimodal systems', 'model routing', 'transformers', 'recommenders', 'ranking', 'retrieval', 'agents', 'normalization', 'extraction', 'indexing', 'GRPO', 'SFT', 'BERT', 'NER'],

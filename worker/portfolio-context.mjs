@@ -30,7 +30,7 @@ Cricket (confirmed directly by Pavan): ${FACTS.cricket}
 Fandom: ${FACTS.fandom} This is Pavan’s affectionate personal opinion, not an objective claim of divinity. Rajnikanth is an alternate spelling of Rajinikanth. Questions about his fandom should distinguish Pavan from Rajinikanth; do not attribute the actor’s career or biography to Pavan.
 Favorite movie and origin of AI interest: ${FACTS.movie}
 Visa / employment sponsorship: ${FACTS.sponsorship}
-Personal: married, father to a son. Likes cricket, coffee, code, the beach and Indian pizza. Favorite team and specific coffee order are not provided.
+Personal (confirmed directly by Pavan): ${FACTS.family} Harini is his wife; Rithansh Krathu is their son. This is Pavan’s own statement of affection and motivation. Keep family answers warm and straightforward. No additional details about either person are supplied. Pavan likes cricket, coffee, code, the beach and Indian pizza. Favorite team and specific coffee order are not provided.
 Open source: interested in contributing to useful ML and AI problems.
 Reviewing: reviews papers for a couple of journals; journal names are not provided.
 Writing: no published posts or newsletter links yet.

@@ -2,6 +2,9 @@
 export const FACTS = {
   greeting: 'Hello! I’m Atom, here to introduce Pavan. Who are you!',
   bot: 'I’m Atom, the AI assistant for this portfolio.',
+  harini: 'Harini is Pavan’s wife. She and their son, Rithansh Krathu, are his reason to exist and excel.',
+  rithansh: 'Rithansh Krathu is Pavan and Harini’s son. Pavan describes Harini and Rithansh as his reason to exist and excel.',
+  family: 'Harini is Pavan’s wife, and Rithansh Krathu is their son. In Pavan’s words: “My reason to exist and excel.”',
   fandom: 'Pavan loves Rajinikanth. In Pavan’s personal fan ranking, he is god. Apparently even the foundation models report to Thalaivar.',
   movie: 'Pavan’s favorite movie is I, Robot. It got him hooked on AI and robotics. A robot movie became a career plan; subtle foreshadowing.',
   sponsorship: 'Pavan will need visa sponsorship.',
@@ -17,7 +20,7 @@ export const FACTS = {
   contact: 'You can contact Pavan at pavantrinath@gmail.com.',
   experience: 'Pavan’s career: Capgemini (October 2015–February 2016), eBay (February 2016–September 2024), Liftoff (September 2024–April 2025), xAI (May–December 2025), and Robinhood (December 2025–present).',
   capgemini: 'Pavan was a Developer / Consultant at Capgemini US LLC from October 2015 to February 2016, working on provisioning as a service using Mistral and StackStorm and observability.',
-  unknownfact: 'That detail about Pavan is not supplied in his public portfolio. Please contact Pavan at pavantrinath@gmail.com.',
+  unknownfact: 'I don’t have that detail in Pavan’s public portfolio. Please contact Pavan at pavantrinath@gmail.com.',
   unrelated: 'I can help with Pavan’s work, interests, or modeling questions related to his experience.'
 };
 
@@ -33,7 +36,13 @@ export function matchQuestion(raw) {
   if (/\b(?:rajinikanth|rajnikanth|rajini|thalaivar)\b/.test(s)) return 'fandom';
   if (/\b(?:visa|sponsorship|sponsor|work authorization|immigration)\b/.test(s)) return 'sponsorship';
   if (/\b(?:movie|film|i,? robot)\b/.test(s) || /(?:hooked|inspired|got|drawn).*\b(?:ai|robotics)\b/.test(s)) return 'movie';
-  if (/\b(?:salary|home address|phone number|birthday|age|born|favorite team|favourite team|coffee order|playing position|batting|statistics)\b/.test(s)) return 'unknownfact';
+  if (/\b(?:salary|home address|phone number|birthday|age|how old|born|favorite team|favourite team|coffee order|playing position|batting|statistics)\b/.test(s)) return 'unknownfact';
+  const harini = /\bharini\b/.test(s);
+  const rithansh = /\brithansh(?: krathu)?\b/.test(s);
+  if (harini && rithansh) return 'family';
+  if (harini) return 'harini';
+  if (rithansh) return 'rithansh';
+  if (/\b(?:wife|son|family|married|children)\b/.test(s) || /reason.*\b(?:exist|excel)\b|\bwhat motivates (?:him|pavan|you)\b/.test(s)) return 'family';
   if (/\blinkedin\b/.test(s)) return 'linkedin';
   if (/\bgithub\b/.test(s)) return 'github';
   if (/\b(?:awards?|honou?rs?|recognition)\b/.test(s)) return 'awards';

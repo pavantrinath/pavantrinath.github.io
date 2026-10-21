@@ -6,6 +6,9 @@ import { FACTS, matchQuestion, isModelingQuestion } from './portfolio-qa.mjs';
 const source = await readFile(new URL('./app.js', import.meta.url), 'utf8');
 const classify = vm.runInNewContext(source.slice(source.indexOf('function classify('), source.indexOf('function careerLink(')) + '; classify', { matchQuestion });
 const cases = {
+  harini: ['Who is Harini?', 'Harini'],
+  rithansh: ['Who is Rithansh Krathu?', 'Rithansh'],
+  family: ['Who are Harini and Rithansh Krathu?', 'Who is his wife?', 'Who is his son?', 'What motivates Pavan?', 'Tell me about his family'],
   fandom: ['Does he like Rajnikanth?', 'What does Pavan think of Rajinikanth?', 'Who is Thalaivar to Pavan?'],
   movie: ['What is your favorite movie?', 'What got him hooked on AI and robotics?', 'Do you like I, Robot?'],
   sponsorship: ['Will he need visa sponsorship?', 'What is your visa status?', 'Do you require work authorization sponsorship?'],
@@ -109,7 +112,7 @@ test('known entity questions skip the model but names alone and unknown facts do
  const {entityMentions}=await import('./portfolio-entities.mjs');
  const code=source.slice(source.indexOf('function hasKnownEntityAnswer('),source.indexOf('async function askAI('));
  const known=vm.runInNewContext(code+';hasKnownEntityAnswer',{classify,isModelingQuestion,entityMentions,normalizePrompt:corrected=>({corrected})});
- for(const q of ['Does he like I, Robot?', 'Does Pavan like Rajinikanth?', 'Which cricket league does he play in?', 'Tell me about his Robinhood work', 'What is his visa sponsorship status?']) assert.equal(known(q),true,q);
+ for(const q of ['Does he like I, Robot?', 'Does Pavan like Rajinikanth?', 'Which cricket league does he play in?', 'Tell me about his Robinhood work', 'What is his visa sponsorship status?', 'Who is Harini?', 'Who is Rithansh Krathu?']) assert.equal(known(q),true,q);
  for(const q of ['Pavan','Tell me about Pavan','What is his coffee order?','Hi!','What is his favorite song?']) assert.equal(known(q),false,q);
 });
 
@@ -216,4 +219,16 @@ test('work answers precede their graph and the witty pointer directs visitors be
  const code=source.slice(source.indexOf('function careerPointer('),source.indexOf('function appendCareerPointer('));
  const pointer=vm.runInNewContext(code+';careerPointer',{classify,normalizePrompt:corrected=>({corrected})});
  for(const q of ['What do you do?','What research interests you?','Tell me about your career'])assert.match(pointer(q),/chart below|timeline below/);
+});
+
+test('family answers preserve the named relationships and owner’s exact sentiment',async()=>{
+ const {entityMentions}=await import('./portfolio-entities.mjs');
+ const {SYSTEM_CONTEXT}=await import('./worker/portfolio-context.mjs');
+ assert.match(FACTS.harini,/Harini is Pavan’s wife/);
+ assert.match(FACTS.rithansh,/Rithansh Krathu is Pavan and Harini’s son/);
+ assert.match(FACTS.family,/“My reason to exist and excel.”/);
+ assert(SYSTEM_CONTEXT.includes(FACTS.family));
+ assert.deepEqual(entityMentions('Harini and Rithansh Krathu').map(m=>[m.text,m.type]),[['Harini','PERSON'],['Rithansh Krathu','PERSON']]);
+ assert.equal(matchQuestion('How old is Rithansh?'),'unknownfact');
+ assert.equal(matchQuestion('What is Rithansh’s age?'),'unknownfact');
 });
