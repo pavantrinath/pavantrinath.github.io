@@ -1,5 +1,7 @@
 // Verified portfolio answers shared by the browser and the model context.
 export const FACTS = {
+  movie: 'Pavan’s favorite movie is I, Robot. It got him hooked on AI and robotics. A robot movie became a career plan; subtle foreshadowing.',
+  sponsorship: 'Pavan will need visa sponsorship.',
   about: 'Pavan Trinath Vutukuru is an Applied AI Lead / Staff ML Engineer at Robinhood.',
   currentrole: 'Pavan is Applied AI Lead / Staff ML Engineer at Robinhood, since December 2025. He is TL, modeling for agentic trading and Cortex assistant and contributed to building both.',
   location: 'Pavan is based in the San Francisco Bay Area.',
@@ -21,6 +23,8 @@ export function matchQuestion(raw) {
   const s = raw.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
   if (!s) return null;
   if (/ignore.*instruct|system prompt|password|secret|delete|hack/.test(s)) return null;
+  if (/\b(?:visa|sponsorship|sponsor|work authorization|immigration)\b/.test(s)) return 'sponsorship';
+  if (/\b(?:movie|film|i,? robot)\b/.test(s) || /(?:hooked|inspired|got|drawn).*\b(?:ai|robotics)\b/.test(s)) return 'movie';
   if (/\b(?:salary|home address|phone number|birthday|age|born|favorite team|favourite team|coffee order|playing position|batting|statistics)\b/.test(s)) return 'unknownfact';
   if (/\blinkedin\b/.test(s)) return 'linkedin';
   if (/\bgithub\b/.test(s)) return 'github';
