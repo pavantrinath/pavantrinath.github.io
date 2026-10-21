@@ -35,27 +35,27 @@ export function initBowlingScene(root) {
   }
   // A running stride has a short stance and an airborne interval; it is
   // not a walking cycle with one foot permanently touching the ground.
-  const runEnd=1700, boundEnd=1960, coilEnd=2180, releaseAt=2400;
-  const followEnd=2850, recoverEnd=3200, deskRunEnd=4050;
+  const runEnd=2200, boundEnd=2500, coilEnd=2760, releaseAt=3020;
+  const followEnd=3540, recoverEnd=3940, deskRunEnd=5000;
   function gait(ms,speed=92/runEnd) {
     const pose=[...poses.run];
-    const cycle=420, duty=.38;
+    const cycle=560, duty=.38;
     const u=(ms/cycle)%1;
     const flight=(u>=duty&&u<.5)||(u>=.5+duty);
     const flightT=u<.5?(u-duty)/(.5-duty):(u-.5-duty)/(.5-duty);
-    const lift=flight?Math.sin(Math.PI*flightT)*5:0;
+    const lift=flight?Math.sin(Math.PI*flightT)*3:0;
     pose[1]-=lift;
     for(let i=3;i<14;i+=2)pose[i]-=lift;
-    // Forward lean and a higher heel recovery make the pace legible at
-    // this tiny scale. Stance travel matches world travel to avoid sliding.
-    pose[2]+=6;pose[4]+=7;
+    // Keep a small natural forward tilt, with a controlled running cadence.
+    // Stance travel matches world travel to avoid sliding.
+    pose[2]=3;pose[4]=4;
     const stanceTravel=speed*cycle*duty;
     for(const [offset,shift] of [[14,0],[18,.5]]) {
       const phase=(u+shift)%1;
       const planted=phase<duty;
       const t=planted?phase/duty:(phase-duty)/(1-duty);
       const fx=planted?stanceTravel/2-stanceTravel*t:-stanceTravel/2+stanceTravel*ease(t);
-      const fy=planted?112:112-Math.sin(Math.PI*t)*22;
+      const fy=planted?112:112-Math.sin(Math.PI*t)*18;
       const dx=fx-pose[0],dy=fy-pose[1],distance=Math.hypot(dx,dy);
       const along=(17*17-16*16+distance*distance)/(2*distance);
       const bend=Math.sqrt(Math.max(0,17*17-along*along));
@@ -102,7 +102,7 @@ export function initBowlingScene(root) {
       x=142+t*58;
     } else {
       pose=mix(poses.stand,poses.sit,ease(Math.min(1,(ms-deskRunEnd)/600)));x=200;
-      if(ms>4700 && ms<9000){const tap=Math.sin(ms/65)*1.5;pose[9]+=tap;pose[13]-=tap;}
+      if(ms>5600 && ms<9000){const tap=Math.sin(ms/65)*1.5;pose[9]+=tap;pose[13]-=tap;}
     }
     const [hx,hy,sx,sy,cx,cy,rex,rey,rhx,rhy,lex,ley,lhx,lhy,rkx,rky,rfx,rfy,lkx,lky,lfx,lfy]=pose;
     const path=(name,points)=>parts[name].setAttribute('d',points.map(([px,py],i)=>`${i?'L':'M'}${x+px} ${py}`).join(' '));
@@ -116,10 +116,10 @@ export function initBowlingScene(root) {
     parts.shadow.setAttribute('cx',x+3);
     parts.ball.setAttribute('opacity',ball?1:0);
     if(ball){parts.ball.setAttribute('cx',ball[0]);parts.ball.setAttribute('cy',ball[1]);}
-    const deskOpacity=Math.max(0,Math.min(1,(ms-3000)/400));
+    const deskOpacity=Math.max(0,Math.min(1,(ms-3740)/400));
     parts.desk.setAttribute('opacity',deskOpacity);parts.seat.setAttribute('opacity',deskOpacity);
     parts.crease.setAttribute('opacity',1-deskOpacity);
-    parts.caption.textContent=ms<boundEnd?'left-arm fast bowling':ms<recoverEnd?'left-arm release. follow through.':ms<4650?'switching disciplines…':'different pitch. same delivery.';
+    parts.caption.textContent=ms<boundEnd?'left-arm fast bowling':ms<recoverEnd?'left-arm release. follow through.':ms<5600?'switching disciplines…':'different pitch. same delivery.';
   }
   function stop(){cancelAnimationFrame(frame);frame=0;root.removeAttribute('data-playing');replay.textContent='↻ Replay';replay.setAttribute('aria-label','Replay bowling and coding animation');}
   function tick(now){const elapsed=Math.min(now-started,9000);draw(elapsed);if(elapsed<9000)frame=requestAnimationFrame(tick);else stop();}

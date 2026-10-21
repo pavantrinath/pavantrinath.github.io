@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initBowlingScene } from './bowling-scene.mjs';
 
-test('fast left-arm run-up has flight phases, planted-foot traction and a straight release', () => {
+test('controlled left-arm run-up has flight phases, planted-foot traction and a straight release', () => {
   const originals = Object.fromEntries(['document','matchMedia','performance','requestAnimationFrame','cancelAnimationFrame'].map(k=>[k,Object.getOwnPropertyDescriptor(globalThis,k)]));
   const part = () => ({attrs:{},setAttribute(k,v){this.attrs[k]=String(v);},addEventListener(){}});
   const parts = new Map();
@@ -17,19 +17,22 @@ test('fast left-arm run-up has flight phases, planted-foot traction and a straig
     callback(70);
     const plantedRight=points('right-leg');
     assert(Math.abs(plantedRight[4]-initialRight[4])<.01,'a planted running foot should stay fixed in world space');
-    callback(300);
+    callback(400);
     const right=points('right-leg'),left=points('left-leg');
-    assert(right[4]-initialRight[4]>10,'the recovering foot should advance with a faster run-up');
-    callback(180);
+    assert(right[4]-initialRight[4]>10,'the recovering foot should advance with the running stride');
+    callback(240);
     assert(points('right-leg')[5]<111&&points('left-leg')[5]<111,'both feet leave the ground during a running stride');
     for (const limb of [right,left]) {
       assert(Math.abs(Math.hypot(limb[2]-limb[0],limb[3]-limb[1])-17)<.01);
       assert(Math.abs(Math.hypot(limb[4]-limb[2],limb[5]-limb[3])-16)<.01);
     }
 
-    for(const ms of [0,150,350,700,1200,1650]){
+    for(const ms of [0,200,450,900,1500,2100]){
       callback(ms);
-      const hipY=points('torso')[1];
+      const torso=points('torso');
+      const hipY=torso[1];
+      const lean=Math.atan2(Math.abs(torso[2]-torso[0]),torso[1]-torso[3])*180/Math.PI;
+      assert(lean<8,'running posture stays upright with only a slight natural lean');
       for(const name of ['left-arm','right-arm']){
         const arm=points(name);
         assert(arm[3]>=hipY-12 && arm[3]<=hipY+1,'running elbows stay beside the waist');
@@ -38,14 +41,14 @@ test('fast left-arm run-up has flight phases, planted-foot traction and a straig
         assert(Math.abs(Math.hypot(arm[4]-arm[2],arm[5]-arm[3])-16)<.01);
       }
     }
-    for(const ms of [0,500,1700,1960,2180,2399]){
+    for(const ms of [0,500,2200,2500,2760,3019]){
       callback(ms);
       const leftHand=points('left-arm');
       const heldBall=parts.get('[data-part="ball"]').attrs;
       assert(Math.abs(Number(heldBall.cx)-leftHand[4])<.001,'the ball stays in the left hand');
       assert(Math.abs(Number(heldBall.cy)-leftHand[5])<.001,'the ball stays in the left hand');
     }
-    callback(2400);
+    callback(3020);
     const arm=points('left-arm');
     const upper=[arm[2]-arm[0],arm[3]-arm[1]];
     const fore=[arm[4]-arm[2],arm[5]-arm[3]];
