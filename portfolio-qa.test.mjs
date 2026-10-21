@@ -189,6 +189,27 @@ test('Atom introduces Pavan consistently rather than claiming his experience',as
  assert.match(SYSTEM_CONTEXT,/Never speak in Pavan’s first person/);
 });
 
+test('chat shows only current work and links historical questions to the full timeline',()=>{
+ const root={hidden:true,children:[],replaceChildren(...children){this.children=children}};
+ const element=()=>({textContent:'',addEventListener(type,handler){this.click=handler}});
+ const calls=[];
+ const code=source.slice(source.indexOf('function showCareerPreview('),source.indexOf('const escapeHTML'));
+ const preview=vm.runInNewContext(code+';showCareerPreview',{
+  $:()=>root,shouldShowCareer:()=>true,document:{createElement:element},
+  showJob:(...args)=>calls.push(args),setView:(...args)=>calls.push(args),
+  classify:()=> 'ebay',normalizePrompt:corrected=>({corrected})
+ });
+ preview('Tell me about eBay');
+ assert.equal(root.hidden,false);
+ assert.equal(root.children.length,3);
+ assert.match(root.children[0].textContent,/Robinhood.*current work/);
+ assert.equal(calls[0][0],'robinhood');
+ assert.equal(calls[0][2],'chat-job-detail');
+ root.children[2].click();
+ assert.equal(calls[1][0],'ebay');
+ assert.equal(calls[2][0],'experience');
+});
+
 test('work answers precede their graph and the witty pointer directs visitors below',async()=>{
  const html=await readFile(new URL('./index.html',import.meta.url),'utf8');
  assert(html.indexOf('id="answer"')<html.indexOf('id="chat-career"'));
