@@ -40,7 +40,7 @@ test('sends full public context and returns text; hides upstream errors', async 
   const original = globalThis.fetch;
   try {
     globalThis.fetch = async (url, options) => {
-      assert.match(url, /gemini-2.5-flash-lite:generateContent$/);
+      assert.match(url, /gemini-3.5-flash-lite:generateContent$/);
       assert.equal(options.headers['x-goog-api-key'], 'test-key');
       const body = JSON.parse(options.body);
       assert.equal(body.contents[0].parts[0].text, 'What did Pavan build?');

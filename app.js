@@ -73,6 +73,6 @@ $('#prompt').addEventListener('keydown',event=>{
     aiEnabled=true;
     $('#ask-ai').hidden=false;
     $('#ai-notice').hidden=false;
-    $('#toy-disclosure').textContent='Local preview · Enter to ask Gemini';
+    $('#toy-disclosure').textContent='Ask about Pavan or anything else · Enter to ask Gemini';
   }catch{/* Static hosting keeps local answers. */}
 })();

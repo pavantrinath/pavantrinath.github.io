@@ -43,7 +43,7 @@ async function chat(request, env) {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     const limit = await env.CHAT_RATE_LIMIT.limit({ key: ip });
     if (!limit.success) return json({ error: 'Too many questions. Try again in a minute.' }, 429, { 'Retry-After': '60' });
-    const model = env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
+    const model = env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
     if (!/^[a-zA-Z0-9._-]+$/.test(model)) return json({ error: 'AI is temporarily unavailable.' }, 503);
     const response = await fetch(
       'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent',
