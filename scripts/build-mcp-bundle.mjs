@@ -14,7 +14,9 @@ const context = (await read('worker/portfolio-context.mjs')).replace("import { F
 const entities = (await read('portfolio-entities.mjs')).replace(/export /g, '');
 const semanticCache = (await read('worker/semantic-cache.mjs')).replace(/^import .*;\n/gm, '').replace('export class SemanticAnswerCache', 'class SemanticAnswerCache');
 const visitorNames = (await read('worker/visitor-names.mjs')).replace('export async function', 'async function');
+const presentationClassifier = (await read('worker/presentation-classifier.mjs')).replace('export function createPresentationClassifier', 'function createPresentationClassifier');
 const handler = (await read('worker/index.mjs'))
+  .replace("import { createPresentationClassifier } from './presentation-classifier.mjs';", '')
   .replace("import { saveVisitorName } from './visitor-names.mjs';", '')
   .replace("import { SYSTEM_CONTEXT } from './portfolio-context.mjs';", '')
   .replace("import { SemanticAnswerCache } from './semantic-cache.mjs';", '')
@@ -30,7 +32,7 @@ function serveStatic(request) {
 }
 `;
 await mkdir(resolve(root, '.wrangler'), { recursive: true });
-await writeFile(resolve(root, '.wrangler/deploy.mjs'), visitorNames + '\n' + facts + '\n' + architectures + '\n' + entities + '\n' + semanticCache + '\n' + context + '\n' + serving + '\n' + handler);
+await writeFile(resolve(root, '.wrangler/deploy.mjs'), presentationClassifier + '\n' + visitorNames + '\n' + facts + '\n' + architectures + '\n' + entities + '\n' + semanticCache + '\n' + context + '\n' + serving + '\n' + handler);
 console.log('Direct API bundle ready in .wrangler/deploy.mjs');
 
 

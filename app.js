@@ -32,13 +32,27 @@ $('#experience').querySelectorAll('[data-job]').forEach(b=>b.addEventListener('c
 showJob('robinhood');
 function shouldShowCareer(raw){
  const intent=classify(normalizePrompt(raw).corrected);
- if(['unknownfact','sponsorship','guardrail','greeting','bot'].includes(intent))return false;
- return ['experience','currentrole','leadership','build','skills','nlp','recommenders','posttraining','frontiers','multimodal','opensource',...Object.keys(jobs)].includes(intent)
+ if(['unknownfact','sponsorship','guardrail','greeting','bot','fandom','movie','cricket','pizza','coffee','family','personal','location','contact','linkedin','github','education','speaking','opportunity','writing'].includes(intent))return false;
+ return ['experience','currentrole','leadership','build','skills','nlp','recommenders','posttraining','frontiers','multimodal','opensource','reviewing',...Object.keys(jobs)].includes(intent)
+   || /\b(?:research|architectures?)\b/i.test(raw)
    || /\b(?:what|tell|describe|show|about)\b.*\b(?:work|career|jobs?|experience)\b/i.test(raw);
 }
-function showCareerPreview(raw){
+function careerPointer(raw){
+ const intent=classify(normalizePrompt(raw).corrected);
+ if(/\\b(?:research|architectures?)\\b/i.test(raw)||['frontiers','posttraining','nlp','recommenders'].includes(intent))return 'From NER to neural rabbit holes. The chart below maps the research and architecture branches.';
+ if(['currentrole','leadership','robinhood'].includes(intent))return 'The job title is the short version. The chart below has the interesting branches.';
+ return 'A career with this many branches deserves a chart. Follow the timeline below.';
+}
+function appendCareerPointer(raw,presentation){
+ if(presentation!=='career'&&!shouldShowCareer(raw))return;
+ const pointer=document.createElement('p');
+ pointer.className='career-pointer';
+ pointer.textContent=careerPointer(raw);
+ $('#answer').append(pointer);
+}
+function showCareerPreview(raw,presentation){
  const root=$('#chat-career');
- root.hidden=!shouldShowCareer(raw);
+ root.hidden=!(presentation==='career'||shouldShowCareer(raw));
  if(root.hidden){root.replaceChildren();return;}
  const heading=document.createElement('h3');
  heading.textContent='Pavan’s work, at a glance';
@@ -79,7 +93,7 @@ function renderEditor(raw){
   mirror.innerHTML=annotateInput(raw);
   mirror.style.transform='translateX(-'+$('#prompt').scrollLeft+'px)';
 }
-function updatePrompt(submitted=false){aiRequest?.abort();aiVersion++;$('#ask-ai').disabled=!$('#prompt').value.trim();$('#ask-ai').textContent='↑';const raw=$('#prompt').value;if(submitted)showCareerPreview(raw);else{$('#chat-career').hidden=true;}renderEditor(raw);const{corrected,edits}=normalizePrompt(raw);const intent=submitted?classify(corrected):'idle';$('#intent').textContent=intent==='idle'?'AWAITING TOKENS':`INTENT / ${intent.toUpperCase()}`;$('#mascot-note').textContent=intent==='guardrail'?'boundaries are a feature.':intent==='contact'?'NERvous? just say hello.':'small model. large opinions.';if(submitted){$('#answer').innerHTML=`<div>${submitted&&raw&&intent!=='greeting'&&intent!=='bot'?`<div class="input-entities">${annotateInput(corrected)}</div>`:''}<p>${responseFor(intent)}</p></div>`;highlightEntities($('#answer'));}else{if(awaitingName)$('#answer').textContent=FACTS.greeting;else $('#answer').innerHTML=draftMarkup(raw);}$('#correction').replaceChildren();if(edits.length){const label=document.createElement('span');label.textContent='Did you mean';const b=document.createElement('button');b.textContent=edits.map(e=>e[1]).join(', ');b.addEventListener('click',applyCorrection);$('#correction').append(label,b,document.createTextNode('? Tab to accept.'))}const n=raw.trim()?Math.ceil(raw.trim().length/4):0;$('#token-count').textContent=`${n} tokens, approximately.`;document.querySelectorAll('[data-compose]').forEach(b=>b.addEventListener('click',openComposer));document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.selectJob)showJob(b.dataset.selectJob);setView(b.dataset.open)}))}
+function updatePrompt(submitted=false){aiRequest?.abort();aiVersion++;$('#ask-ai').disabled=!$('#prompt').value.trim();$('#ask-ai').textContent='↑';const raw=$('#prompt').value;if(submitted)showCareerPreview(raw);else{$('#chat-career').hidden=true;}renderEditor(raw);const{corrected,edits}=normalizePrompt(raw);const intent=submitted?classify(corrected):'idle';$('#intent').textContent=intent==='idle'?'AWAITING TOKENS':`INTENT / ${intent.toUpperCase()}`;$('#mascot-note').textContent=intent==='guardrail'?'boundaries are a feature.':intent==='contact'?'NERvous? just say hello.':'small model. large opinions.';if(submitted){$('#answer').innerHTML=`<div>${submitted&&raw&&intent!=='greeting'&&intent!=='bot'?`<div class="input-entities">${annotateInput(corrected)}</div>`:''}<p>${responseFor(intent)}</p></div>`;highlightEntities($('#answer'));appendCareerPointer(raw);}else{if(awaitingName)$('#answer').textContent=FACTS.greeting;else $('#answer').innerHTML=draftMarkup(raw);}$('#correction').replaceChildren();if(edits.length){const label=document.createElement('span');label.textContent='Did you mean';const b=document.createElement('button');b.textContent=edits.map(e=>e[1]).join(', ');b.addEventListener('click',applyCorrection);$('#correction').append(label,b,document.createTextNode('? Tab to accept.'))}const n=raw.trim()?Math.ceil(raw.trim().length/4):0;$('#token-count').textContent=`${n} tokens, approximately.`;document.querySelectorAll('[data-compose]').forEach(b=>b.addEventListener('click',openComposer));document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.selectJob)showJob(b.dataset.selectJob);setView(b.dataset.open)}))}
 function applyCorrection(){const p=$('#prompt');p.value=normalizePrompt(p.value).corrected;updatePrompt();p.focus()}
 $('#prompt').addEventListener('input',()=>{updatePrompt();scheduleDraftLookup();});$('#prompt').addEventListener('scroll',()=>renderEditor($('#prompt').value));$('#prompt').addEventListener('keydown',e=>{if(e.key==='Tab'&&normalizePrompt(e.target.value).edits.length){e.preventDefault();applyCorrection()}});$('#clear').addEventListener('click',()=>{$('#prompt').value='';updatePrompt();$('#prompt').focus()});document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{$('#prompt').value=b.dataset.prompt;updatePrompt();$('#prompt').focus()}));updatePrompt();
 
@@ -144,6 +158,7 @@ async function askAI(){
     let data=await (draftLookup?.message===message?draftLookup.promise:lookupAnswer(message));
     if(draftLookup?.message===message)draftLookup=null;
     if(version!==aiVersion)return;
+    showCareerPreview(message,data?.presentation);
     if(typeof data?.answer!=='string'){
       button.textContent='…';
       $('#intent').textContent='ASKING ATOM';
@@ -167,6 +182,8 @@ async function askAI(){
     entities.innerHTML=annotateInput(message);
     bubble.append(answer,attribution);
     $('#answer').replaceChildren(entities,bubble);
+    showCareerPreview(message,data.presentation);
+    appendCareerPointer(message,data.presentation);
     $('#intent').textContent='ANSWER / ATOM';
   }catch(error){
     if(error.name==='AbortError'||version!==aiVersion)return;

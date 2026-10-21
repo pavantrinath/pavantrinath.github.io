@@ -75,7 +75,7 @@ test('draft cache checks never generate and use a separate limiter key', async (
      ...env,CHAT_RATE_LIMIT:{limit:async data=>{key=data.key;return {success:true};}}
    });
    assert.equal(response.status,200);
-   assert.deepEqual(await response.json(),{cache:'miss'});
+   assert.deepEqual(await response.json(),{cache:'miss',presentation:'text'});
    assert.match(key,/^lookup:/);
    assert.equal(calls,0);
  } finally {globalThis.fetch=original;}

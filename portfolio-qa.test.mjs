@@ -52,7 +52,7 @@ test('greetings render without a biography or entity annotations, including subm
   const functions = source.slice(source.indexOf('function classify('), source.indexOf('function applyCorrection('));
   const submit = source.slice(source.indexOf('function hasKnownEntityAnswer('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
-    $, awaitingName:false, isModelingQuestion, showCareerPreview:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
+    $, awaitingName:false, isModelingQuestion, showCareerPreview:()=>{},appendCareerPointer:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
     highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
@@ -87,7 +87,7 @@ test('draft typing waits for submission instead of showing a refusal', async () 
  const $=s=>{if(!nodes.has(s))nodes.set(s,{value:'',style:{},scrollLeft:0,textContent:'',innerHTML:'',replaceChildren(){}});return nodes.get(s)};
  $('#prompt').value='Tell me';
  const fn=source.slice(source.indexOf('function draftMarkup('),source.indexOf('function applyCorrection('));
- const update=vm.runInNewContext(fn+';updatePrompt',{$,awaitingName:false,showCareerPreview:()=>{},renderEditor:()=>{},annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
+ const update=vm.runInNewContext(fn+';updatePrompt',{$,awaitingName:false,showCareerPreview:()=>{},appendCareerPointer:()=>{},renderEditor:()=>{},annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
  update();
  assert.match($('#answer').innerHTML,/typing-wait/);
  assert.doesNotMatch($('#answer').innerHTML,/not possible/);
@@ -120,7 +120,7 @@ test('a prepared cache hit renders on Send without showing thinking or generatin
  const code=source.slice(source.indexOf('async function askAI('),source.indexOf("$('#ask-ai').addEventListener"));
  let calls=0;
  const run=vm.runInNewContext(code+';askAI',{
-   $,awaitingName:false,isModelingQuestion,showCareerPreview:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
+   $,awaitingName:false,isModelingQuestion,showCareerPreview:()=>{},appendCareerPointer:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
    aiEnabled:true,aiRequest:null,aiVersion:0,hasKnownEntityAnswer:()=>false,classify:()=> 'unknown',normalizePrompt:corrected=>({corrected}),
    document:{createElement:()=>({append(){},set textContent(v){states.push(v)}})},renderEntities:s=>s,annotateInput:s=>s,
    fetch:()=>{calls++;throw Error('cache hit must not generate')}
@@ -134,7 +134,7 @@ test('a prepared cache hit renders on Send without showing thinking or generatin
 test('work questions promote the career rendering, while greetings and personal questions do not',()=>{
  const code=source.slice(source.indexOf('function shouldShowCareer('),source.indexOf('function showCareerPreview('));
  const show=vm.runInNewContext(code+';shouldShowCareer',{classify,normalizePrompt:corrected=>({corrected}),jobs:{ebay:{},liftoff:{},xai:{},robinhood:{}}});
- for(const q of ['What do you do?','What is your work?','Tell me about your career','What did he build at xAI?','What are your skills?'])assert.equal(show(q),true,q);
+ for(const q of ['What do you do?','What is your work?','Tell me about your career','What did he build at xAI?','What are your skills?','What research interests you?','Which architectures do you know?'])assert.equal(show(q),true,q);
  for(const q of ['Hi!','What is his salary?','What is his visa sponsorship status?','Which cricket league does he play in?'])assert.equal(show(q),false,q);
 });
 
@@ -173,4 +173,12 @@ test('main input accepts names while questions skip introduction',()=>{
  assert.equal(parse("I'm Zoë"),'Zoë');
  assert.equal(parse('My name is José'),'José');
  for(const q of ['What do you do?','How do transformers work?','contact','Hi!','<img>']) assert.equal(parse(q),null,q);
+});
+
+test('work answers precede their graph and the witty pointer directs visitors below',async()=>{
+ const html=await readFile(new URL('./index.html',import.meta.url),'utf8');
+ assert(html.indexOf('id="answer"')<html.indexOf('id="chat-career"'));
+ const code=source.slice(source.indexOf('function careerPointer('),source.indexOf('function appendCareerPointer('));
+ const pointer=vm.runInNewContext(code+';careerPointer',{classify,normalizePrompt:corrected=>({corrected})});
+ for(const q of ['What do you do?','What research interests you?','Tell me about your career'])assert.match(pointer(q),/chart below|timeline below/);
 });

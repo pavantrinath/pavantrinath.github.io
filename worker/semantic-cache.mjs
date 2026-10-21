@@ -27,7 +27,7 @@ export class SemanticAnswerCache {
     const key = namespace + ':' + normalizeQuery(message);
     const guard = queryGuard(message);
     const exact = this.entries.get(key);
-    if (exact) { this.entries.delete(key); this.entries.set(key, exact); return { answer: exact.answer, hit: 'exact' }; }
+    if (exact) { this.entries.delete(key); this.entries.set(key, exact); return { answer: exact.answer, hit: 'exact', vector: exact.vector }; }
     let vector = this.prepared.get(key) || null;
     if (ai && !vector) {
       let timer;
@@ -58,7 +58,7 @@ export class SemanticAnswerCache {
       if (best && (!matches[1] || best.entry.answer === matches[1].entry.answer || best.score - matches[1].score >= 0.03)) {
         this.entries.delete(best.entry.key);
         this.entries.set(best.entry.key, best.entry);
-        return { answer: best.entry.answer, hit: 'semantic' };
+        return { answer: best.entry.answer, hit: 'semantic', vector };
       }
     }
     return { key, namespace, guard, vector };
