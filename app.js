@@ -148,6 +148,8 @@ async function askAI(){
     else{aiRequest?.abort();aiVersion++;welcomeHarini();}
     return;
   }
+  const explicitName=/^(?:(?:hi|hello|hey)\b[!,.\s]*)?(?:my name is|i am|i’m|i'm|this is|call me|it's)\s+/i.test(message)&&visitorNameFrom(message);
+  if(explicitName){await saveIntroduction(explicitName);return;}
   if(awaitingName){
     if(classify(normalizePrompt(message).corrected)==='greeting'){updatePrompt(true);return;}
     const name=visitorNameFrom(message);
@@ -272,11 +274,17 @@ function welcomeHarini(){
  setTimeout(()=>burst.remove(),1800);
 }
 function visitorNameFrom(raw){
- const name=raw.trim().replace(/^(?:my name is|i am|i’m|i'm|call me)\s+/i,'').replace(/[.!]+$/,'').trim();
+ const text=raw.trim().replace(/[’]/g,"'").replace(/^(?:hi|hello|hey)\b[!,.\s]*/i,'').trim();
+ const introduction=/^(?:my name is|i am|i'm|this is|call me|it's)\s+/i.exec(text);
+ let name=introduction?text.slice(introduction[0].length):text;
+ // A biography or question after the introduction is not part of the name.
+ if(introduction)name=name.split(/\s+(?:and|but|who|from|working|here|based)\b|[,!;?]|\.\s+/i)[0];
+ else name=name.replace(/\s+here[.!]*$/i,'');
+ name=name.replace(/[.!]+$/,'').trim();
  if(!name||name.length>80||name.split(/\s+/).length>5||!/^[\p{L}\p{M} .’'\-]+$/u.test(name))return null;
- if(/^harini$/i.test(name))return 'Harini';
- if(/\b(?:hi|hello|hey|what|why|how|where|who|which|when|tell|show|explain|about|skip)\b/i.test(name)||isModelingQuestion(raw)||hasKnownEntityAnswer(raw))return null;
- return name;
+ if(/(?<![\p{L}\p{M}])(?:hi|hello|hey|what|why|how|where|who|which|when|tell|show|explain|about|skip|a|an|the|engineer|developer|student|working|looking|interested|happy|ready|here|visiting|doing|fine|good)(?![\p{L}\p{M}])/iu.test(name))return null;
+ if(!introduction&&(isModelingQuestion(raw)||hasKnownEntityAnswer(raw)))return null;
+ return /^harini$/i.test(name)?'Harini':name;
 }
 async function saveIntroduction(name){
  const special=/^harini$/i.test(name.trim());

@@ -173,6 +173,12 @@ test('main input accepts names while questions skip introduction',()=>{
  const code=source.slice(source.indexOf('function visitorNameFrom('),source.indexOf('async function saveIntroduction('));
  const parse=vm.runInNewContext(code+';visitorNameFrom',{isModelingQuestion,hasKnownEntityAnswer:raw=>['contact','cricket'].includes(raw)});
  assert.equal(parse('Jane Doe'),'Jane Doe');
+ assert.equal(parse('Hi I am kiran and I am working as engineer'),'kiran');
+ assert.equal(parse("Hello! I'm Kiran, an engineer"),'Kiran');
+ assert.equal(parse('My name is José García and I work at Robinhood'),'José García');
+ assert.equal(parse('Hi, this is Anne-Marie O’Neill from London'),"Anne-Marie O'Neill");
+ assert.equal(parse('I am Harini and I am his wife'),'Harini');
+ for(const q of ['I am an engineer','I am working as engineer','I am interested in modeling','Hi I am looking for Pavan','Who is Kiran?'])assert.equal(parse(q),null,q);
  assert.equal(parse("I'm Zoë"),'Zoë');
  assert.equal(parse('My name is José'),'José');
  for(const q of ['What do you do?','How do transformers work?','contact','Hi!','<img>']) assert.equal(parse(q),null,q);
