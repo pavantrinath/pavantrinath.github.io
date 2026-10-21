@@ -1,30 +1,39 @@
 # Cloudflare hosting
 
-The existing GitHub Pages site continues to work. Cloudflare configuration is ready; no Cloudflare deployment or domain registration has been completed by this commit.
+## Current deployment (October 21, 2026)
 
-## Deploy on the free plan
+- Cloudflare Worker: pavantrinath
+- URL: https://pavantrinath.pavantrinath.workers.dev
+- Account: eb88723ebcb227538828d4a35c4e7d69
+- Deployment: ff29f514f9bc48018c7b093c8cda836a
+- Custom domain attached: pavantrinath.xyz
+- Domain registration: purchased by the owner at Porkbun.
+- Zone status at last check: pending nameserver activation, Free Website plan.
+- No paid subscription was enabled.
+- No automatic GitHub-to-Cloudflare deployment is connected yet. The GitHub app connection was looping, so the initial deployment was uploaded directly through the Cloudflare MCP API.
+- The direct upload serves the current index.html, app.js, and style.css from an embedded Worker module. Future Wrangler deployments can use the static assets configuration in this repository.
+- Local route/content checks passed. The deployment and custom domain attachment were confirmed by Cloudflare's API; public HTTP verification from the execution environment returned 403 and could not confirm rendering.
 
-1. Sign in at https://dash.cloudflare.com/ and choose Workers & Pages > Create application > Import a repository.
-2. Connect GitHub and select pavantrinath/pavantrinath.github.io, branch master.
-3. Use Worker name pavantrinath. Leave the dashboard build command empty: Wrangler's build configuration runs node scripts/build-cloudflare.mjs. Deploy command: npx wrangler deploy.
-4. Deploy and verify the returned workers.dev URL. Stay on Workers Free.
-5. Future pushes to master deploy through the Cloudflare Git integration.
+## Required Porkbun step
+
+In Porkbun > Domain Management > pavantrinath.xyz > Nameservers, replace the existing nameservers with exactly:
+
+- nitin.ns.cloudflare.com
+- susan.ns.cloudflare.com
+
+Cloudflare activates the zone once delegation is detected. The custom domain is already attached to the Worker, so no GitHub Pages A records are needed. Verify https://pavantrinath.xyz once activation and TLS issuance finish.
+
+## Future deployments
 
 Local packaging: node scripts/build-cloudflare.mjs
 Local deployment after Cloudflare CLI authentication: npx wrangler deploy
 
-Only website files are copied to dist; repository configuration and credentials are not served.
+Wrangler runs the configured build command and uploads dist as static assets. Only website files are copied to dist; repository configuration and credentials are not served.
 
-## Purchase and attach pavantrinath.xyz
+To enable automatic deployment later, connect this repository's master branch to the existing pavantrinath Worker through Cloudflare Builds. Leave the dashboard build command empty; deploy command: npx wrangler deploy. Until that connection is confirmed, GitHub pushes alone do not update Cloudflare.
 
-1. Search for the exact spelling pavantrinath.xyz at https://porkbun.com/.
-2. Confirm availability and final checkout pricing. The advertised standard .xyz price checked October 21, 2026 was USD 2.04 for year one and USD 14.21 for renewal; premium domains and taxes may differ.
-3. Register in your own account.
-4. Add pavantrinath.xyz as a website/zone in Cloudflare on the Free plan. Replace its nameservers at Porkbun with the two Cloudflare assigns.
-5. Once the zone is active, open the deployed Worker > Settings > Domains & Routes > Add > Custom Domain, and add pavantrinath.xyz. Cloudflare provisions DNS and TLS.
-6. Optionally add www.pavantrinath.xyz as another custom domain.
-7. Verify the custom domain before changing links or redirecting the existing GitHub Pages address.
+The existing GitHub Pages site remains available separately.
 
 ## LLM backend
 
-This configuration deploys the current static website. It does not enable an LLM or incur LLM API charges. A future Worker handler can expose /api/chat and keep the provider credential in a Cloudflare secret. Never put an API key in app.js or commit it.
+The current deployment does not enable an LLM. A future Worker handler can expose /api/chat and keep the provider credential in a Cloudflare secret. Never put an API key in app.js or commit it.
