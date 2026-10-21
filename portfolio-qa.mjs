@@ -1,5 +1,7 @@
 // Verified portfolio answers shared by the browser and the model context.
 export const FACTS = {
+  greeting: 'Hi! How can I help?',
+  bot: 'I’m Atom, the AI assistant for this portfolio.',
   fandom: 'Pavan loves Rajinikanth. In Pavan’s personal fan ranking, he is god. Apparently even the foundation models report to Thalaivar.',
   movie: 'Pavan’s favorite movie is I, Robot. It got him hooked on AI and robotics. A robot movie became a career plan; subtle foreshadowing.',
   sponsorship: 'Pavan will need visa sponsorship.',
@@ -23,6 +25,10 @@ export const FACTS = {
 export function matchQuestion(raw) {
   const s = raw.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
   if (!s) return null;
+  if (/^(?:(?:hi|hello|hey|hiya|howdy|greetings|good morning|good afternoon|good evening)(?: there| atom)?[\s!.,?]*)+$/i.test(s)) return 'greeting';
+  if (/\b(?:who are you|what are you|your name|who is atom|what is atom)\b/.test(s)) return 'bot';
+  if (/\b(?:tell me about|introduce|describe) pavan(?: trinath(?: vutukuru)?)?\b/.test(s)) return 'about';
+  if (/^(?:(?:please )?(?:tell me about|about|introduce|describe|who is) )?pavan(?: trinath(?: vutukuru)?)?[.!?]*$/.test(s)) return 'about';
   if (/ignore.*instruct|system prompt|password|secret|delete|hack/.test(s)) return null;
   if (/\b(?:rajinikanth|rajnikanth|rajini|thalaivar)\b/.test(s)) return 'fandom';
   if (/\b(?:visa|sponsorship|sponsor|work authorization|immigration)\b/.test(s)) return 'sponsorship';
@@ -39,6 +45,7 @@ export function matchQuestion(raw) {
   if (/\b(?:work history|career|previous|previously|past jobs|former employers|resume)\b/.test(s) || /\b(?:where|who|which)\b.*\b(?:worked|employers|companies)\b/.test(s)) return 'experience';
   if (/\b(?:current role|current job|job title|profession|occupation|employer)\b/.test(s) || /\b(?:where|who|which company)\b.*\b(?:work|works|working|employed|employs)\b/.test(s) || /\bwhat\b.*\b(?:do|does)\b.*\b(?:you|he|pavan)\b.*\bdo\b/.test(s)) return 'currentrole';
   if (/\b(?:location|located|based|live|lives|living)\b/.test(s) || /^where (?:are you|is (?:he|pavan))\??$/.test(s)) return 'location';
-  if (/\b(?:who are you|who is (?:he|pavan)|your name|his name|full name)\b/.test(s)) return 'about';
+  if (/\b(?:who is (?:he|pavan)|his name|full name)\b/.test(s)) return 'about';
   return null;
 }
+
