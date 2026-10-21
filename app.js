@@ -6,6 +6,7 @@ const $=s=>document.querySelector(s);
 let aiEnabled=false, aiRequest=null, aiVersion=0;
 let draftLookup=null, draftTimer=null;
 let awaitingName=true;
+let introducedVisitor=null;
 const views=[...document.querySelectorAll('[data-view]')];
 function setView(name,focus=false){if(!views.some(b=>b.dataset.view===name))name='home';views.forEach(b=>{const active=b.dataset.view===name;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;$('#'+b.dataset.view).hidden=!active;if(active&&focus)b.focus()});history.replaceState(null,'','#'+name)}
 views.forEach((b,i)=>{b.addEventListener('click',()=>setView(b.dataset.view));b.addEventListener('keydown',e=>{let n;if(e.key==='ArrowRight')n=(i+1)%views.length;if(e.key==='ArrowLeft')n=(i+views.length-1)%views.length;if(e.key==='Home')n=0;if(e.key==='End')n=views.length-1;if(n!==undefined){e.preventDefault();setView(views[n].dataset.view,true)}})});window.addEventListener('hashchange',()=>setView(location.hash.slice(1)));setView(location.hash.slice(1)||'home');
@@ -110,11 +111,18 @@ function scheduleDraftLookup(){
  if(!message||!/[\\s.!?]$/.test(raw))return;
  const intent=classify(normalizePrompt(message).corrected);
  $('#intent').textContent=['unknown','idle'].includes(intent)?'COMPOSING':'INTENT / '+intent.toUpperCase();
- if(!aiEnabled||hasKnownEntityAnswer(message)||['greeting','bot'].includes(intent)||message.length<8)return;
+ if(!aiEnabled||hariniAffectionReply(message,introducedVisitor)||hasKnownEntityAnswer(message)||['greeting','bot'].includes(intent)||message.length<8)return;
  draftTimer=setTimeout(()=>{
   if($('#prompt').value.trim()!==message||draftLookup?.message===message)return;
   draftLookup={message,promise:lookupAnswer(message)};
  },350);
+}
+function hariniAffectionReply(raw,name){
+ if(name!=='Harini')return null;
+ const s=raw.toLowerCase().replace(/[’]/g,"'");
+ if(!/\b(?:does|do|think|wonder)\b|\?/.test(s))return null;
+ if(!/\b(?:he|pavan)\s+(?:(?:really|still|actually)\s+)?(?:love|like|loves|likes)\s+me\b/.test(s))return null;
+ return 'Harini, you’re the only special person here, other than Pavan, named as both a user and owner. He calls you his reason for existence.';
 }
 function hasKnownEntityAnswer(raw){
   if(isModelingQuestion(raw))return false;
@@ -127,6 +135,14 @@ async function askAI(){
   const message=$('#prompt').value.trim();
   clearTimeout(draftTimer);
   if(!message)return;
+  const personalReply=hariniAffectionReply(message,introducedVisitor);
+  if(personalReply){
+    aiRequest?.abort();aiVersion++;draftLookup=null;
+    $('#chat-career').hidden=true;
+    $('#answer').innerHTML='<p>'+renderEntities(personalReply)+'</p>';
+    $('#intent').textContent='JUST FOR HARINI';
+    return;
+  }
   if(isHariniIntroduction(message,awaitingName)){
     if(awaitingName)await saveIntroduction('Harini');
     else{aiRequest?.abort();aiVersion++;welcomeHarini();}
@@ -226,6 +242,7 @@ function isHariniIntroduction(raw,collectingName=false){
    || (collectingName&&/^harini$/i.test(s));
 }
 function welcomeHarini(){
+ introducedVisitor='Harini';
  finishIntroduction();
  $('#prompt').value='';
  renderEditor('');
@@ -275,6 +292,7 @@ async function saveIntroduction(name){
   const data=await response.json();
   if(version!==aiVersion)return;
   if(!response.ok||data.saved!==true)throw Error('save failed');
+  introducedVisitor=name;
   finishIntroduction();
   $('#prompt').value='';
   renderEditor('');

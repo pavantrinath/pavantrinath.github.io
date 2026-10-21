@@ -55,7 +55,7 @@ test('greetings render without a biography or entity annotations, including subm
   const functions = source.slice(source.indexOf('function classify('), source.indexOf('function applyCorrection('));
   const submit = source.slice(source.indexOf('function hasKnownEntityAnswer('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
-    $, awaitingName:false, isHariniIntroduction:()=>false, isModelingQuestion, showCareerPreview:()=>{},appendCareerPointer:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
+    $, awaitingName:false, isHariniIntroduction:()=>false,hariniAffectionReply:()=>null,introducedVisitor:null, isModelingQuestion, showCareerPreview:()=>{},appendCareerPointer:()=>{}, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
     highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
@@ -123,7 +123,7 @@ test('a prepared cache hit renders on Send without showing thinking or generatin
  const code=source.slice(source.indexOf('async function askAI('),source.indexOf("$('#ask-ai').addEventListener"));
  let calls=0;
  const run=vm.runInNewContext(code+';askAI',{
-   $,awaitingName:false,isHariniIntroduction:()=>false,isModelingQuestion,showCareerPreview:()=>{},appendCareerPointer:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
+   $,awaitingName:false,isHariniIntroduction:()=>false,hariniAffectionReply:()=>null,introducedVisitor:null,isModelingQuestion,showCareerPreview:()=>{},appendCareerPointer:()=>{},clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
    aiEnabled:true,aiRequest:null,aiVersion:0,hasKnownEntityAnswer:()=>false,classify:()=> 'unknown',normalizePrompt:corrected=>({corrected}),
    document:{createElement:()=>({append(){},set textContent(v){states.push(v)}})},renderEntities:s=>s,annotateInput:s=>s,
    fetch:()=>{calls++;throw Error('cache hit must not generate')}
@@ -256,4 +256,17 @@ test('Harini welcome displays the requested line and a finite decorative heart b
  assert.equal(burst.children.length,24);
  cleanup();
  assert.equal(burst.removed,true);
+});
+
+test('affection reply is personal to a visitor introduced as Harini',()=>{
+ const code=source.slice(source.indexOf('function hariniAffectionReply('),source.indexOf('function hasKnownEntityAnswer('));
+ const reply=vm.runInNewContext(code+';hariniAffectionReply');
+ for(const q of ['Does he love me?','Does he like me?','Does Pavan really love me?','Do you think he loves me?']){
+  assert.match(reply(q,'Harini'),/only special person here, other than Pavan/);
+  assert.match(reply(q,'Harini'),/named as both a user and owner/);
+  assert.equal(reply(q,null),null);
+  assert.equal(reply(q,'Jane'),null);
+ }
+ assert.equal(reply('Who is Harini?','Harini'),null);
+ assert.equal(reply('Does he like cricket?','Harini'),null);
 });
