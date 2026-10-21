@@ -1,3 +1,4 @@
+import { saveVisitorName } from './visitor-names.mjs';
 import { SYSTEM_CONTEXT } from './portfolio-context.mjs';
 import { SemanticAnswerCache } from './semantic-cache.mjs';
 
@@ -89,6 +90,7 @@ export default {
       if (!['GET', 'HEAD'].includes(request.method)) return json({ error: 'Use GET.' }, 405);
       return json({ enabled: ready(env), provider: 'Gemini' });
     }
+    if (path === '/api/visitor-name') return saveVisitorName(request, env);
     if (path === '/api/chat') return chat(request, env);
     if (path.startsWith('/api/')) return json({ error: 'Not found.' }, 404);
     return env.ASSETS.fetch(request);

@@ -12,7 +12,9 @@ const facts = (await read('portfolio-qa.mjs')).replace(/export /g, '');
 const context = (await read('worker/portfolio-context.mjs')).replace("import { FACTS } from '../portfolio-qa.mjs';", '').replace('export const SYSTEM_CONTEXT', 'const SYSTEM_CONTEXT');
 const entities = (await read('portfolio-entities.mjs')).replace(/export /g, '');
 const semanticCache = (await read('worker/semantic-cache.mjs')).replace(/^import .*;\n/gm, '').replace('export class SemanticAnswerCache', 'class SemanticAnswerCache');
+const visitorNames = (await read('worker/visitor-names.mjs')).replace('export async function', 'async function');
 const handler = (await read('worker/index.mjs'))
+  .replace("import { saveVisitorName } from './visitor-names.mjs';", '')
   .replace("import { SYSTEM_CONTEXT } from './portfolio-context.mjs';", '')
   .replace("import { SemanticAnswerCache } from './semantic-cache.mjs';", '')
   .replace('return env.ASSETS.fetch(request);', 'return env.ASSETS ? env.ASSETS.fetch(request) : serveStatic(request);');
@@ -27,6 +29,6 @@ function serveStatic(request) {
 }
 `;
 await mkdir(resolve(root, '.wrangler'), { recursive: true });
-await writeFile(resolve(root, '.wrangler/deploy.mjs'), facts + '\n' + entities + '\n' + semanticCache + '\n' + context + '\n' + serving + '\n' + handler);
+await writeFile(resolve(root, '.wrangler/deploy.mjs'), visitorNames + '\n' + facts + '\n' + entities + '\n' + semanticCache + '\n' + context + '\n' + serving + '\n' + handler);
 console.log('Direct API bundle ready in .wrangler/deploy.mjs');
 

@@ -1,0 +1,30 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import worker from './index.mjs';
+const origin='https://portfolio.example';
+const request=(data,headers={})=>new Request(origin+'/api/visitor-name',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json',...headers},body:JSON.stringify(data)});
+test('only explicitly shared names are stored, with timestamp and no IP or chat text',async()=>{
+ const writes=[];
+ const env={VISITOR_NAMES:{put:async(...args)=>writes.push(args)},CHAT_RATE_LIMIT:{limit:async()=>({success:true})}};
+ const response=await worker.fetch(request({name:'  Zoë   O’Brien ',consent:true},{'CF-Connecting-IP':'192.0.2.1'}),env);
+ assert.equal(response.status,201);
+ const [key,value,options]=writes[0];
+ assert.match(key,/^visitor:/);
+ const saved=JSON.parse(value);
+ assert.deepEqual(Object.keys(saved).sort(),['name','sharedAt']);
+ assert.equal(saved.name,'Zoë O’Brien');
+ assert.equal(options.metadata.name,saved.name);
+ assert.equal(options.expirationTtl,undefined);
+ assert(!value.includes('192.0.2.1'));
+ for(const data of [{name:'Jane'}, {name:'Jane',consent:false},{name:'<script>',consent:true},{name:'x'.repeat(81),consent:true},{name:'',consent:true}]) assert.equal((await worker.fetch(request(data),env)).status,400);
+ assert.equal(writes.length,1);
+});
+test('name route blocks cross-origin, reads, oversized input, quotas and unavailable storage',async()=>{
+ const env={VISITOR_NAMES:{put:async()=>{throw Error('must not write')}},CHAT_RATE_LIMIT:{limit:async()=>({success:false})}};
+ assert.equal((await worker.fetch(request({name:'Jane',consent:true},{Origin:'https://other.example'}),env)).status,403);
+ assert.equal((await worker.fetch(new Request(origin+'/api/visitor-name'),env)).status,405);
+ assert.equal((await worker.fetch(request({name:'Jane',consent:true},{'Content-Type':'text/plain'}),env)).status,415);
+ assert.equal((await worker.fetch(request({name:'x'.repeat(2000),consent:true}),env)).status,413);
+ assert.equal((await worker.fetch(request({name:'Jane',consent:true}),env)).status,429);
+ assert.equal((await worker.fetch(request({name:'Jane',consent:true}),{})).status,503);
+});

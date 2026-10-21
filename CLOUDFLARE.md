@@ -56,3 +56,7 @@ Validation: node --test worker/chat.test.mjs
 Direct MCP packaging: node scripts/build-mcp-bundle.mjs
 Wrangler packaging and deployment: npx wrangler deploy (uses the configured build command).
 
+
+## Visitor names
+
+Greeting submissions ask for an optional name. Save name explicitly shares it with Pavan; Skip stores nothing. Names and submission timestamps are stored without expiry in the private Workers KV namespace `atom-visitor-names` (binding `VISITOR_NAMES`). View them in Cloudflare > Storage & databases > Workers KV > atom-visitor-names > KV Pairs. Records are self-reported, not verified identities. No chat text, IP address, or visitor browsing history is stored with them. The POST-only same-origin `/api/visitor-name` endpoint is bounded and rate limited; no public list/read endpoint exists. Names are kept separate from the 100-answer semantic LRU cache.

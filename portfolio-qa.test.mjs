@@ -61,7 +61,7 @@ test('greetings render without a biography or entity annotations, including subm
     $('#prompt').value = greeting;
     run.updatePrompt(true);
     await run.askAI();
-    assert.match($('#answer').innerHTML, /Hi! How can I help/);
+    assert.match($('#answer').innerHTML, /What’s your name/);
     assert.doesNotMatch($('#answer').innerHTML, /class="entity"|input-entities|Robinhood|Vutukuru/);
   }
   $('#prompt').value='Which cricket league does he play in?';

@@ -34,5 +34,11 @@
   },
   "ai": {
     "binding": "AI"
-  }
+  },
+  "kv_namespaces": [
+    {
+      "binding": "VISITOR_NAMES",
+      "id": "eba604fa8b7b4e29983a0f7e07505e0e"
+    }
+  ]
 }
