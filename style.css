@@ -54,3 +54,14 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .draft-entities:empty{display:none}
 @keyframes typing-pulse{0%,70%,100%{opacity:.25;transform:translateY(0)}35%{opacity:.9;transform:translateY(-3px)}}
 @media(prefers-reduced-motion:reduce){.typing-wait>span{animation:none;opacity:.6}}
+
+/* Mirror the single-line input so entity labels sit on the typed words. */
+.prompt-editor{position:relative;flex:1;min-width:0;overflow:hidden}
+.prompt-mirror-clip{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+#prompt-mirror{position:absolute;top:24px;left:0;white-space:pre;font:16px/24px var(--font-sans);padding:9px 0;color:var(--ink);transform-origin:left center}
+.input-wrap #prompt{position:relative;display:block;font:16px/24px var(--font-sans);padding:33px 0 9px;color:transparent;caret-color:var(--ink);background:transparent}
+.input-wrap #prompt::placeholder{color:var(--muted)}
+#prompt-mirror .entity{position:relative;display:inline;border:0;border-radius:3px;padding:0;margin:0;font:inherit;background:#e0edc5;box-shadow:0 0 0 1px #a3b68a;vertical-align:baseline}
+#prompt-mirror .entity small{position:absolute;left:0;bottom:100%;font:600 8px/12px var(--font-sans);letter-spacing:0;white-space:nowrap;margin:0;color:var(--green)}
+#prompt-mirror a{color:inherit;text-decoration:none}
+#prompt-mirror .entity[data-type="PERSON"]{background:#e0edc5}

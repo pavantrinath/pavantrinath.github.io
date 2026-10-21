@@ -45,7 +45,7 @@ test('greetings render without a biography or entity annotations, including subm
   const { renderEntities, highlightEntities } = await import('./portfolio-entities.mjs');
   const nodes = new Map();
   const $ = selector => {
-    if (!nodes.has(selector)) nodes.set(selector, { value: '', textContent: '', innerHTML: '', replaceChildren() {} });
+    if (!nodes.has(selector)) nodes.set(selector, { value: '', style:{}, scrollLeft:0, textContent: '', innerHTML: '', replaceChildren() {} });
     return nodes.get(selector);
   };
   let calls = 0;
@@ -53,7 +53,7 @@ test('greetings render without a biography or entity annotations, including subm
   const submit = source.slice(source.indexOf('async function askAI('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
     $, FACTS, matchQuestion, renderEntities,
-    highlightEntities: () => {}, normalizePrompt: corrected => ({ corrected, edits: [] }),
+    highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
   });
@@ -81,16 +81,17 @@ test('chat UI uses Atom and has no Gemini branding', async () => {
 test('draft typing waits for submission instead of showing a refusal', async () => {
  const {renderEntities,entityMentions}=await import('./portfolio-entities.mjs');
  const nodes=new Map();
- const $=s=>{if(!nodes.has(s))nodes.set(s,{value:'',textContent:'',innerHTML:'',replaceChildren(){}});return nodes.get(s)};
+ const $=s=>{if(!nodes.has(s))nodes.set(s,{value:'',style:{},scrollLeft:0,textContent:'',innerHTML:'',replaceChildren(){}});return nodes.get(s)};
  $('#prompt').value='Tell me';
  const fn=source.slice(source.indexOf('function draftMarkup('),source.indexOf('function applyCorrection('));
- const update=vm.runInNewContext(fn+';updatePrompt',{$,annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
+ const update=vm.runInNewContext(fn+';updatePrompt',{$,renderEditor:()=>{},annotateInput:renderEntities,entityMentions,aiRequest:null,aiVersion:0,normalizePrompt:corrected=>({corrected,edits:[]}),document:{querySelectorAll:()=>[]},classify:()=>{throw Error('draft must not classify')},responseFor:()=>{throw Error('draft must not answer')}});
  update();
  assert.match($('#answer').innerHTML,/typing-wait/);
  assert.doesNotMatch($('#answer').innerHTML,/not possible/);
  $('#prompt').value='Tell me about Pavan ';
  update();
- assert.match($('#answer').innerHTML,/data-type="PERSON"/);
+ assert.doesNotMatch($('#answer').innerHTML,/data-type="PERSON"/);
+ assert.match($('#prompt-mirror').innerHTML,/data-type="PERSON"/);
  assert.doesNotMatch($('#answer').innerHTML,/typing-wait/);
  $('#prompt').value='';
  update();
