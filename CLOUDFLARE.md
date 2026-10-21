@@ -60,3 +60,7 @@ Wrangler packaging and deployment: npx wrangler deploy (uses the configured buil
 ## Visitor names
 
 Greeting submissions ask for an optional name. Save name explicitly shares it with Pavan; Skip stores nothing. Names and submission timestamps are stored without expiry in the private Workers KV namespace `atom-visitor-names` (binding `VISITOR_NAMES`). View them in Cloudflare > Storage & databases > Workers KV > atom-visitor-names > KV Pairs. Records are self-reported, not verified identities. No chat text, IP address, or visitor browsing history is stored with them. The POST-only same-origin `/api/visitor-name` endpoint is bounded and rate limited; no public list/read endpoint exists. Names are kept separate from the 100-answer semantic LRU cache.
+
+## Draft preparation
+
+After a completed word and a short debounce, the browser infers local intent and may send `lookupOnly: true` to `/api/chat` to check the semantic cache. Lookup-only requests never generate text and use a separate rate-limit key. The latest matching preparation promise is reused on Send; only a miss starts generation and displays thinking. Up to 100 prepared embeddings are retained per isolate to avoid repeating embedding inference on Send. The 100-answer LRU remains separate and has no expiry. Draft processing is disclosed beside the input.

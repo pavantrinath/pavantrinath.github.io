@@ -3,6 +3,7 @@ import { initBowlingScene } from './bowling-scene.mjs';
 import { FACTS, matchQuestion } from './portfolio-qa.mjs';
 const $=s=>document.querySelector(s);
 let aiEnabled=false, aiRequest=null, aiVersion=0;
+let draftLookup=null, draftTimer=null;
 const views=[...document.querySelectorAll('[data-view]')];
 function setView(name,focus=false){if(!views.some(b=>b.dataset.view===name))name='home';views.forEach(b=>{const active=b.dataset.view===name;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;$('#'+b.dataset.view).hidden=!active;if(active&&focus)b.focus()});history.replaceState(null,'','#'+name)}
 views.forEach((b,i)=>{b.addEventListener('click',()=>setView(b.dataset.view));b.addEventListener('keydown',e=>{let n;if(e.key==='ArrowRight')n=(i+1)%views.length;if(e.key==='ArrowLeft')n=(i+views.length-1)%views.length;if(e.key==='Home')n=0;if(e.key==='End')n=views.length-1;if(n!==undefined){e.preventDefault();setView(views[n].dataset.view,true)}})});window.addEventListener('hashchange',()=>setView(location.hash.slice(1)));setView(location.hash.slice(1)||'home');
@@ -34,7 +35,7 @@ function renderEditor(raw){
 }
 function updatePrompt(submitted=false){aiRequest?.abort();aiVersion++;$('#ask-ai').disabled=!$('#prompt').value.trim();$('#ask-ai').textContent='↑';const raw=$('#prompt').value;renderEditor(raw);const{corrected,edits}=normalizePrompt(raw);const intent=submitted?classify(corrected):'idle';$('#visitor-form').hidden=!(submitted&&intent==='greeting');$('#intent').textContent=intent==='idle'?'AWAITING TOKENS':`INTENT / ${intent.toUpperCase()}`;$('#mascot-note').textContent=intent==='guardrail'?'boundaries are a feature.':intent==='contact'?'NERvous? just say hello.':'small model. large opinions.';if(submitted){$('#answer').innerHTML=`<div>${submitted&&raw&&intent!=='greeting'&&intent!=='bot'?`<div class="input-entities">${annotateInput(corrected)}</div>`:''}<p>${responseFor(intent)}</p></div>`;highlightEntities($('#answer'));}else{$('#answer').innerHTML=draftMarkup(raw);}$('#correction').replaceChildren();if(edits.length){const label=document.createElement('span');label.textContent='Did you mean';const b=document.createElement('button');b.textContent=edits.map(e=>e[1]).join(', ');b.addEventListener('click',applyCorrection);$('#correction').append(label,b,document.createTextNode('? Tab to accept.'))}const n=raw.trim()?Math.ceil(raw.trim().length/4):0;$('#token-count').textContent=`${n} tokens, approximately.`;document.querySelectorAll('[data-compose]').forEach(b=>b.addEventListener('click',openComposer));document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.selectJob)showJob(b.dataset.selectJob);setView(b.dataset.open)}))}
 function applyCorrection(){const p=$('#prompt');p.value=normalizePrompt(p.value).corrected;updatePrompt();p.focus()}
-$('#prompt').addEventListener('input',()=>updatePrompt());$('#prompt').addEventListener('scroll',()=>renderEditor($('#prompt').value));$('#prompt').addEventListener('keydown',e=>{if(e.key==='Tab'&&normalizePrompt(e.target.value).edits.length){e.preventDefault();applyCorrection()}});$('#clear').addEventListener('click',()=>{$('#prompt').value='';updatePrompt();$('#prompt').focus()});document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{$('#prompt').value=b.dataset.prompt;updatePrompt();$('#prompt').focus()}));updatePrompt();
+$('#prompt').addEventListener('input',()=>{updatePrompt();scheduleDraftLookup();});$('#prompt').addEventListener('scroll',()=>renderEditor($('#prompt').value));$('#prompt').addEventListener('keydown',e=>{if(e.key==='Tab'&&normalizePrompt(e.target.value).edits.length){e.preventDefault();applyCorrection()}});$('#clear').addEventListener('click',()=>{$('#prompt').value='';updatePrompt();$('#prompt').focus()});document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{$('#prompt').value=b.dataset.prompt;updatePrompt();$('#prompt').focus()}));updatePrompt();
 
 function openComposer(){const dialog=$('#opportunity-dialog');if(!dialog.open)dialog.showModal();$('#compose-status').textContent='This opens your email app with the draft. You review and send it there.';$('#email-message').focus()}
 function emailDraftURL(subject,message){return 'mailto:pavantrinath@gmail.com?subject='+encodeURIComponent(subject.trim())+'&body='+encodeURIComponent(message.trim())}
@@ -42,6 +43,26 @@ $('#close-compose').addEventListener('click',()=>$('#opportunity-dialog').close(
 $('#opportunity-dialog').addEventListener('click',e=>{if(e.target===$('#opportunity-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}});
 $('#opportunity-form').addEventListener('submit',e=>{e.preventDefault();const subject=$('#email-subject').value,message=$('#email-message').value;if(!subject.trim()||!message.trim()){$('#compose-status').textContent='Add a subject and a message first.';return}window.location.href=emailDraftURL(subject,message);$('#compose-status').textContent='Draft handed to your email app. Finish sending there; this site cannot confirm delivery.'});
 $('#copy-email').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('pavantrinath@gmail.com');$('#compose-status').textContent='Email address copied.'}catch{$('#compose-status').textContent='Copy this address: pavantrinath@gmail.com'}});
+async function lookupAnswer(message){
+ try{
+  const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,lookupOnly:true})});
+  if(!response.ok)return null;
+  return await response.json();
+ }catch{return null;}
+}
+function scheduleDraftLookup(){
+ clearTimeout(draftTimer);
+ const raw=$('#prompt').value;
+ const message=raw.trim();
+ if(!message||!/[\\s.!?]$/.test(raw))return;
+ const intent=classify(normalizePrompt(message).corrected);
+ $('#intent').textContent=['unknown','idle'].includes(intent)?'COMPOSING':'INTENT / '+intent.toUpperCase();
+ if(!aiEnabled||hasKnownEntityAnswer(message)||['greeting','bot'].includes(intent)||message.length<8)return;
+ draftTimer=setTimeout(()=>{
+  if($('#prompt').value.trim()!==message||draftLookup?.message===message)return;
+  draftLookup={message,promise:lookupAnswer(message)};
+ },350);
+}
 function hasKnownEntityAnswer(raw){
   const {corrected}=normalizePrompt(raw);
   const intent=classify(corrected);
@@ -50,6 +71,7 @@ function hasKnownEntityAnswer(raw){
 }
 async function askAI(){
   const message=$('#prompt').value.trim();
+  clearTimeout(draftTimer);
   if(!message)return;
   if(!aiEnabled||hasKnownEntityAnswer(message)){updatePrompt(true);return;}
   if(['greeting','bot'].includes(classify(normalizePrompt(message).corrected))){updatePrompt(true);return;}
@@ -59,17 +81,25 @@ async function askAI(){
   const version=++aiVersion;
   const button=$('#ask-ai');
   button.disabled=true;
-  button.textContent='…';
-  $('#intent').textContent='ASKING ATOM';
-  $('#answer').textContent='Atom is thinking…';
+  button.textContent='↑';
+  $('#intent').textContent='CHECKING ANSWER';
+  $('#answer').replaceChildren();
   try{
-    const response=await fetch('/api/chat',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message}),signal:controller.signal
-    });
-    const data=await response.json();
+    let data=await (draftLookup?.message===message?draftLookup.promise:lookupAnswer(message));
+    if(draftLookup?.message===message)draftLookup=null;
     if(version!==aiVersion)return;
-    if(!response.ok||typeof data.answer!=='string')throw new Error('unavailable');
+    if(typeof data?.answer!=='string'){
+      button.textContent='…';
+      $('#intent').textContent='ASKING ATOM';
+      $('#answer').textContent='Atom is thinking…';
+      const response=await fetch('/api/chat',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({message}),signal:controller.signal
+      });
+      data=await response.json();
+      if(version!==aiVersion)return;
+      if(!response.ok||typeof data.answer!=='string')throw new Error('unavailable');
+    }
     const bubble=document.createElement('div');
     bubble.className='llm-bubble';
     const answer=document.createElement('p');
@@ -135,3 +165,4 @@ $('#visitor-form').addEventListener('submit',async event=>{
  }catch{$('#visitor-status').textContent='Could not save your name. Please try again or skip.';}
  finally{button.disabled=false;}
 });
+

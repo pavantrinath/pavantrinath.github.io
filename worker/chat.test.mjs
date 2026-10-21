@@ -65,3 +65,19 @@ test('website fallback works and unknown API paths return 404', async () => {
   assert.equal(await (await worker.fetch(new Request(origin), env)).text(), 'site');
   assert.equal((await worker.fetch(new Request(origin + '/api/nope'), env)).status, 404);
 });
+
+test('draft cache checks never generate and use a separate limiter key', async () => {
+ const original=globalThis.fetch;
+ let calls=0, key='';
+ try {
+   globalThis.fetch=async()=>{calls++;throw Error('must not generate');};
+   const response=await worker.fetch(request({message:'A fresh draft question',lookupOnly:true}),{
+     ...env,CHAT_RATE_LIMIT:{limit:async data=>{key=data.key;return {success:true};}}
+   });
+   assert.equal(response.status,200);
+   assert.deepEqual(await response.json(),{cache:'miss'});
+   assert.match(key,/^lookup:/);
+   assert.equal(calls,0);
+ } finally {globalThis.fetch=original;}
+});
+

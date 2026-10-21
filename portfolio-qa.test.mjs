@@ -52,7 +52,7 @@ test('greetings render without a biography or entity annotations, including subm
   const functions = source.slice(source.indexOf('function classify('), source.indexOf('function applyCorrection('));
   const submit = source.slice(source.indexOf('function hasKnownEntityAnswer('), source.indexOf("$('#ask-ai').addEventListener"));
   const run = vm.runInNewContext(functions + '\n' + submit + '; ({updatePrompt,askAI})', {
-    $, FACTS, matchQuestion, renderEntities, entityMentions,
+    $, FACTS, matchQuestion, renderEntities, entityMentions, clearTimeout, draftTimer:null,
     highlightEntities: () => {}, renderEditor:()=>{}, normalizePrompt: corrected => ({ corrected, edits: [] }),
     document: { querySelectorAll: () => [] }, aiEnabled: true, aiRequest: null, aiVersion: 0,
     fetch: () => { calls++; throw new Error('greetings must stay local'); }
@@ -111,4 +111,22 @@ test('known entity questions skip the model but names alone and unknown facts do
  const known=vm.runInNewContext(code+';hasKnownEntityAnswer',{classify,entityMentions,normalizePrompt:corrected=>({corrected})});
  for(const q of ['Does he like I, Robot?', 'Does Pavan like Rajinikanth?', 'Which cricket league does he play in?', 'Tell me about his Robinhood work', 'What is his visa sponsorship status?']) assert.equal(known(q),true,q);
  for(const q of ['Pavan','Tell me about Pavan','What is his coffee order?','Hi!','What is his favorite song?']) assert.equal(known(q),false,q);
+});
+
+test('a prepared cache hit renders on Send without showing thinking or generating', async()=>{
+ const nodes=new Map(), states=[];
+ const $=key=>{if(!nodes.has(key))nodes.set(key,{value:'',append(){},replaceChildren(){},set textContent(v){states.push(v)}});return nodes.get(key)};
+ $('#prompt').value='A cached question';
+ const code=source.slice(source.indexOf('async function askAI('),source.indexOf("$('#ask-ai').addEventListener"));
+ let calls=0;
+ const run=vm.runInNewContext(code+';askAI',{
+   $,clearTimeout,AbortController,draftTimer:null,draftLookup:{message:'A cached question',promise:Promise.resolve({answer:'Cached response',cache:'semantic'})},
+   aiEnabled:true,aiRequest:null,aiVersion:0,hasKnownEntityAnswer:()=>false,classify:()=> 'unknown',normalizePrompt:corrected=>({corrected}),
+   document:{createElement:()=>({append(){},set textContent(v){states.push(v)}})},renderEntities:s=>s,annotateInput:s=>s,
+   fetch:()=>{calls++;throw Error('cache hit must not generate')}
+ });
+ await run();
+ assert.equal(calls,0);
+ assert(!states.includes('Atom is thinking…'));
+ assert(states.includes('ANSWER / ATOM'));
 });

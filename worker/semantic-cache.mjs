@@ -18,6 +18,7 @@ function unitVector(value) {
 export class SemanticAnswerCache {
   constructor({ capacity = 100, threshold = 0.94 } = {}) {
     this.entries = new Map();
+    this.prepared = new Map();
     this.capacity = capacity;
     this.threshold = threshold;
   }
@@ -27,8 +28,8 @@ export class SemanticAnswerCache {
     const guard = queryGuard(message);
     const exact = this.entries.get(key);
     if (exact) { this.entries.delete(key); this.entries.set(key, exact); return { answer: exact.answer, hit: 'exact' }; }
-    let vector = null;
-    if (ai) {
+    let vector = this.prepared.get(key) || null;
+    if (ai && !vector) {
       let timer;
       try {
         const result = await Promise.race([
@@ -36,6 +37,11 @@ export class SemanticAnswerCache {
           new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Embedding timeout')), 2000); })
         ]);
         vector = unitVector(result?.data?.[0]);
+        if(vector){
+          this.prepared.delete(key);
+          this.prepared.set(key,vector);
+          while(this.prepared.size>this.capacity)this.prepared.delete(this.prepared.keys().next().value);
+        }
       } catch { /* Cache failure must not block a fresh answer. */ }
       finally { clearTimeout(timer); }
     }
