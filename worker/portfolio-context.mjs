@@ -1,3 +1,4 @@
+import { FACTS } from '../portfolio-qa.mjs';
 const career = {
 ebay:{period:'FEB 2016 — SEP 2024',title:'Senior ML Engineer · eBay',summary:'Traditional NLP, recommenders, and the machinery that makes a marketplace searchable.',branches:[{name:'Language understanding',skills:'Machine translation · BERT · NER',detail:'Machine translation, entity recognition, and language understanding for marketplace content.'},{name:'Structured knowledge',skills:'Extraction · normalization · indexing',detail:'Extracting useful attributes, normalizing messy product content, and making it available to search.'},{name:'Discovery',skills:'Recommenders · inference',detail:'Recommendations and production inference. Built a Triton / ONNX platform handling 100M+ daily inferences.'}]},
 liftoff:{period:'SEP 2024 — APR 2025',title:'Staff ML Engineer · Liftoff',summary:'Transformers at scale and sequential models for advertising.',branches:[{name:'User sequences',skills:'Transformers · sequential models',detail:'Modeling sequences of user behavior with transformers at advertising scale.'},{name:'Ads relevance',skills:'Ranking · retrieval',detail:'Ranking and retrieval models for advertising relevance and personalization.'},{name:'Learning signals',skills:'Embeddings · conversions · A/B tests',detail:'User embeddings, unattributed conversion signals, and temporal patterns, validated through controlled experiments.'}]},
@@ -10,20 +11,21 @@ Do not give personalized financial advice or trading recommendations. Identify y
 Resume work highlights (as stated in the uploaded resume, not independently verified): Robinhood: selected within five months to provide technical leadership for a 14-engineer AI R&D team; foundation models, SFT/RL, Agentic RL, automated evaluations, LLM-as-a-Judge, model routing, persistent memory, retrieval, contextual reasoning and multi-agent workflows. AI systems powering Social Feed, Search, Fraud and Growth Recommendations. xAI: unified autoregressive transformer for organic and sponsored-content ranking adapting Grok’s pretraining architecture; RQ-VAE semantic IDs for generative retrieval; Grok post-training for commerce and catalog question answering, helping reduce hallucinations by approximately 12%. Liftoff: user embeddings in conversion models (6% revenue improvement), learning from unattributed postbacks (4% lift), and time-embedding experiments (2% increase), reported separately rather than summed. eBay: transformer-based content understanding and normalization (~$220M GMV uplift), model evaluation framework reducing assessment cycles from hours to near-instantaneous, NER (~35% fill-rate improvement), category recommendation, and Triton/ONNX GPU inference platform with 3x throughput, 40% lower latency and 100M+ daily inferences. Do not describe these as sole-authored achievements.
 Additional skills (uploaded resume): Hugging Face, TensorFlow Serving, PySpark, Polars, BigQuery, Docker, MySQL, MongoDB, DNNs, RNNs, attention mechanisms, variational autoencoders, and user sequence models.
 Public facts (the uploaded PavanTrinathsResume.pdf supersedes the September 2025 resume where they differ; direct owner instructions about attribution take precedence):
-Name: Pavan Trinath Vutukuru (Pavan Trinath).
-Current role: Applied AI Lead / Staff ML Engineer at Robinhood.
+Name: ${FACTS.about}
+Current role: ${FACTS.currentrole}
 Robinhood project attribution: TL, modeling for BOTH agentic trading and Cortex assistant; he contributed to building both. Use "TL, modeling", never "core contributor", and do not imply sole authorship.
-Location: San Francisco Bay Area. Happy to come in anywhere across the Bay, including San Jose and San Francisco, to give talks if his experience is relevant to the audience. No exact home address is public.
+Location: ${FACTS.location} Happy to come in anywhere across the Bay, including San Jose and San Francisco, to give talks if his experience is relevant to the audience. No exact home address is public.
 Contact: pavantrinath@gmail.com. GitHub: https://github.com/pavantrinath. LinkedIn: https://www.linkedin.com/in/pavantrinath. Website: https://pavantrinath.xyz.
 Skills: Python, Go, Java, PyTorch, JAX, Triton, ONNX, Kubernetes. Foundation models, fine-tuning, SFT, reinforcement learning, agentic RL, GRPO, generative recommenders, ranking, retrieval, agents and model routing. Started with phrase-based machine translation, then NER, BERT, extraction, normalization and indexing.
 Interests: looped transformers, physical intelligence, diffusion models. These are interests, not claims of having built all of them. Some multimodal work, described modestly.
-Education (resume): Master’s in Cognitive Science, University of Texas at Dallas, July 2015. Bachelor of Technology in Computer Science, KL University, May 2013. Earlier school education is not supplied; do not invent it.
+Education (resume): ${FACTS.education}
 Earlier experience (resume): Developer / Consultant at Capgemini US LLC, October 2015 to February 2016, working on provisioning as a service using Mistral and StackStorm and observability.
-Awards (uploaded resume): eBay Critical Talent Award (top 1% performance); Spot Award for Excellence for production description extraction; Best Idea Award at eBay’s annual innovation program for a large-scale model evaluation framework later built and adopted company-wide.
+Awards (uploaded resume): ${FACTS.awards}
 Community (September 2025 resume): Google Summer of Code team mentor since 2022 and recurring guest speaker at University of Texas at Dallas since 2017, as recorded in that resume. Do not claim continued activity after that resume without newer confirmation.
-Cricket (confirmed directly by Pavan): plays for Indian Champs in NACL (North American Cricket League). Team is Indian Champs; league is NACL. No playing statistics, position, schedule, or other leagues are supplied.
+Cricket (confirmed directly by Pavan): ${FACTS.cricket}
 Personal: married, father to a son. Likes cricket, coffee, code, the beach and Indian pizza. Favorite team and specific coffee order are not provided.
 Open source: interested in contributing to useful ML and AI problems.
 Reviewing: reviews papers for a couple of journals; journal names are not provided.
 Writing: no published posts or newsletter links yet.
 Career details (dates as supplied by Pavan; do not invent updates): ` + JSON.stringify(career);
+
