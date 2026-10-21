@@ -103,3 +103,8 @@ h1,h2{letter-spacing:-.045em;line-height:1.12}
 .architecture-references{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
 .architecture-references a{text-decoration:underline}
 .entity[data-type="ARCHITECTURE"]{background:#e7e1fb;border-color:#c2b6de}
+
+/* Keep the introduction visible above a bounded, independently scrollable preview. */
+.career-preview{max-height:min(420px,55svh);overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#9eb087 transparent}
+.career-preview:focus-visible{outline:3px solid #bf6c36;outline-offset:4px}
+@media(max-width:760px){.career-preview{max-height:min(360px,50svh)}}
