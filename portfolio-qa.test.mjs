@@ -92,5 +92,11 @@ test('draft typing waits for submission instead of showing a refusal', async () 
  update();
  assert.match($('#answer').innerHTML,/data-type="PERSON"/);
  assert.doesNotMatch($('#answer').innerHTML,/typing-wait/);
- assert.equal($('#ask-ai').disabled,false);
+ $('#prompt').value='';
+ update();
+ assert.equal($('#answer').innerHTML,'');
+ $('#prompt').value='   ';
+ update();
+ assert.equal($('#answer').innerHTML,'');
+ assert.equal($('#ask-ai').disabled,true);
 });
