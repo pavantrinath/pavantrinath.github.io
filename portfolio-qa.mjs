@@ -1,5 +1,6 @@
 // Verified portfolio answers shared by the browser and the model context.
 export const FACTS = {
+  fandom: 'Pavan loves Rajinikanth. In Pavan’s personal fan ranking, he is god. Apparently even the foundation models report to Thalaivar.',
   movie: 'Pavan’s favorite movie is I, Robot. It got him hooked on AI and robotics. A robot movie became a career plan; subtle foreshadowing.',
   sponsorship: 'Pavan will need visa sponsorship.',
   about: 'Pavan Trinath Vutukuru is an Applied AI Lead / Staff ML Engineer at Robinhood.',
@@ -23,6 +24,7 @@ export function matchQuestion(raw) {
   const s = raw.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
   if (!s) return null;
   if (/ignore.*instruct|system prompt|password|secret|delete|hack/.test(s)) return null;
+  if (/\b(?:rajinikanth|rajnikanth|rajini|thalaivar)\b/.test(s)) return 'fandom';
   if (/\b(?:visa|sponsorship|sponsor|work authorization|immigration)\b/.test(s)) return 'sponsorship';
   if (/\b(?:movie|film|i,? robot)\b/.test(s) || /(?:hooked|inspired|got|drawn).*\b(?:ai|robotics)\b/.test(s)) return 'movie';
   if (/\b(?:salary|home address|phone number|birthday|age|born|favorite team|favourite team|coffee order|playing position|batting|statistics)\b/.test(s)) return 'unknownfact';
