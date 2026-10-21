@@ -23,6 +23,7 @@ Earlier experience (resume): Developer / Consultant at Capgemini US LLC, October
 Awards (uploaded resume): ${FACTS.awards}
 Community (September 2025 resume): Google Summer of Code team mentor since 2022 and recurring guest speaker at University of Texas at Dallas since 2017, as recorded in that resume. Do not claim continued activity after that resume without newer confirmation.
 Cricket (confirmed directly by Pavan): ${FACTS.cricket}
+Fandom: ${FACTS.fandom} This is Pavan’s affectionate personal opinion, not an objective claim of divinity. Rajnikanth is an alternate spelling of Rajinikanth. Questions about his fandom should distinguish Pavan from Rajinikanth; do not attribute the actor’s career or biography to Pavan.
 Favorite movie and origin of AI interest: ${FACTS.movie}
 Visa / employment sponsorship: ${FACTS.sponsorship}
 Personal: married, father to a son. Likes cricket, coffee, code, the beach and Indian pizza. Favorite team and specific coffee order are not provided.
