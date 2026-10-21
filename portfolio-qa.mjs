@@ -1,7 +1,7 @@
 // Verified portfolio answers shared by the browser and the model context.
 export const FACTS = {
   greeting: 'Hi! How can I help?',
-  bot: 'I’m Argo, the AI assistant for this portfolio.',
+  bot: 'I’m Atom, the AI assistant for this portfolio.',
   fandom: 'Pavan loves Rajinikanth. In Pavan’s personal fan ranking, he is god. Apparently even the foundation models report to Thalaivar.',
   movie: 'Pavan’s favorite movie is I, Robot. It got him hooked on AI and robotics. A robot movie became a career plan; subtle foreshadowing.',
   sponsorship: 'Pavan will need visa sponsorship.',
@@ -25,8 +25,8 @@ export const FACTS = {
 export function matchQuestion(raw) {
   const s = raw.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
   if (!s) return null;
-  if (/^(?:(?:hi|hello|hey|hiya|howdy|greetings|good morning|good afternoon|good evening)(?: there| argo)?[\s!.,?]*)+$/i.test(s)) return 'greeting';
-  if (/\b(?:who are you|what are you|your name|who is argo|what is argo)\b/.test(s)) return 'bot';
+  if (/^(?:(?:hi|hello|hey|hiya|howdy|greetings|good morning|good afternoon|good evening)(?: there| atom)?[\s!.,?]*)+$/i.test(s)) return 'greeting';
+  if (/\b(?:who are you|what are you|your name|who is atom|what is atom)\b/.test(s)) return 'bot';
   if (/\b(?:tell me about|introduce|describe) pavan(?: trinath(?: vutukuru)?)?\b/.test(s)) return 'about';
   if (/^(?:(?:please )?(?:tell me about|about|introduce|describe|who is) )?pavan(?: trinath(?: vutukuru)?)?[.!?]*$/.test(s)) return 'about';
   if (/ignore.*instruct|system prompt|password|secret|delete|hack/.test(s)) return null;
